@@ -1,0 +1,17 @@
+.partners-row{
+	.wp-block-column{
+		display: flex;
+		align-items: center;
+		border: solid 1px #ebebeb;
+		padding: 30px 30px 0;
+		
+		&:hover{
+			background-color: #fbfbfb;
+		}
+
+		.wp-block-image{
+			display: block;
+			width: 100%;
+		}
+	}
+}

@@ -1,0 +1,25 @@
+blockquote {
+	position:    relative;
+	border-left: solid 3px $color-b;
+	padding:     20px 30px 5px 40px;
+	background: #ebebeb;
+	
+	&:before {
+		font-family: "Font Awesome 5 Free";
+		font-weight: 900;
+		content:     "\f10d";
+		color:       $color-b;
+		position:    absolute;
+		left:        8px;
+		top:         0;
+	}
+	
+	&:after{
+		@extend :before;
+		content:     "\f10e";
+		left: auto;
+		right:        8px;
+		top:         auto;
+		bottom: 10px
+	}
+}

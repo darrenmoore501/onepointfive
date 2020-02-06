@@ -1,0 +1,65 @@
+form {
+	
+	input, label, textarea {
+		width: 100%;
+	}
+	
+	input[type="submit"] {
+		display:    block;
+		margin-top: 20px;
+	}
+	
+	.wpcf7-validation-errors {
+		margin:     0;
+		color:      white;
+		background: $color-e;
+	}
+	div.wpcf7-validation-errors, div.wpcf7-acceptance-missing {
+    	border: 2px solid $color-b;
+    	margin-bottom:2em;
+	}
+	span.wpcf7-not-valid-tip {
+	    color: $color-e;
+	    font-size: 1em;
+
+	}
+}
+
+main#primary {
+	form {
+		
+		label {
+			color: #FFF;
+		}
+		
+		span {
+			display:     block;
+			padding-top: 10px;
+		}
+		
+		input, textarea {
+			padding: 8px;
+		}
+		input[type="submit"] {
+			display:             block;
+			width:               auto;
+			margin:              0 auto;
+			padding:             10px 30px 12px;
+			border-radius:       50px;
+			background:          #1c9bd1;
+			
+			background-size:     1px 500px;
+			background-position: 0 0;
+			color: white;
+			transition:          all 0.25s ease;
+			
+			&:hover {
+				background-position: 0 -200px;
+			}
+			
+			&:active {
+				background-position: 0 -400px;
+			}
+		}
+	}
+}

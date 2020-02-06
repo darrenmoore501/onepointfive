@@ -1,0 +1,232 @@
+footer#colophon {
+	background: transparent;
+	position:relative;
+	h1, h2, h3, h4, p, label {
+		color: white;
+	}
+	
+	img {
+		max-width: 100%;
+		width:     200px;
+		height:    auto;
+	}
+	
+	a {
+		color: darken($color-d, 20%);
+	}
+	
+	label {
+		font-weight: 200;
+	}
+	
+	ul {
+		padding: 0;
+		list-style: none;
+		
+		a:after {
+			content:      '\f054';
+			font-family:  "Font Awesome 5 Free";
+			font-weight:  900;
+			padding-left: 10px;
+			font-size:    12px;
+		}
+	}
+
+	.main {
+		background:$color-b;
+	}
+
+	
+	hr {
+		border-top: solid 2px darken($color-b, 10%);
+		height:     1px;
+		background: lighten($color-b, 10%);
+	}
+	
+	svg{
+		background: transparent;
+	}
+	
+	.accreditation {
+		background: white;
+		padding:    40px 100px 20px;
+		
+		hr {
+			border-color: #ebebeb;
+			background:   #ebebeb;
+		}
+		
+		img {
+			max-height: 67px;
+			width:      auto;
+			margin:     20px;
+		}
+	}
+	
+	.main {
+		padding: 80px 0 40px 0;
+	}
+	
+	.address {
+		text-align: center;
+		
+		p {
+			color: lighten(#fff, 40%);
+		}
+	}
+	
+	.divider {
+		margin-bottom: 20px;
+	}
+	
+	
+	.menu-footer-terms-container {
+		width:          100%;
+		padding-bottom: 10px;
+		
+		.footer-menu-terms {
+			text-align: center;
+			width:      100%;
+			display:    inline-block;
+			
+			li {
+				display: inline-block;
+				margin:  0 20px;
+				
+				a {
+					color: lighten($color-b, 40%);
+					
+					&:hover {
+						color: lighten($color-b, 50%);
+					}
+				}
+			}
+		}
+	}
+	
+	.social {
+		font-size: 40px;
+		
+		a {
+			color:        lighten($color-b, 30%);
+			margin-right: 5px;
+			
+			&:hover {
+				color: lighten($color-b, 60%);
+			}
+		}
+	}
+	
+.sub-footer {
+	border-top: solid 2px white;
+}
+.bird {
+	background-image: url(/wp-content/themes/onepointfive/src/media/bird-cells-new.svg);
+	background-size: auto 100%;
+	width: 88px;
+	height: 125px;
+	will-change: background-position;
+	
+	animation-name: fly-cycle;
+	animation-timing-function: steps(10);
+	animation-iteration-count: infinite;
+
+	&--one {
+		animation-duration: 1s;
+		animation-delay: -0.5s;		
+	}
+	
+	&--two {
+		animation-duration: 0.9s;
+		animation-delay: -0.75s;
+	}
+}
+
+.bird-container {
+	position: absolute;
+	top: 30%;
+	left: -10%;
+	transform: scale(0) translateX(-10vw);
+	will-change: transform;
+	
+	animation-name: fly-right-one;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	
+	&--one {
+		animation-duration: 15s;
+		animation-delay: 0;
+		z-index:50;
+	}	
+	&--two {
+		animation-duration: 16s;
+		animation-delay: 1s;
+		z-index:10;
+	}
+	
+}
+}
+
+	@media only screen and (max-width: $bp-mobile) {
+			padding: 0 0 80px 0;
+			.main{
+				padding: 15px;
+			}
+			
+			.logo {
+				text-align:    center;
+				margin-bottom: 40px;
+			}
+			
+			form {
+				width:     100%;
+				max-width: 100%;
+			}
+		}
+		
+
+
+
+@keyframes fly-cycle {
+	
+	100% {
+		background-position: -900px 0;
+	}
+	
+}
+
+@keyframes fly-right-one {
+	
+	0% {
+		transform: scale(0.3) translateX(-10vw);
+	}
+	
+	10% {
+		transform: translateY(2vh) translateX(10vw) scale(0.4);
+	}
+	
+	20% {
+		transform: translateY(0vh) translateX(30vw) scale(0.5);
+	}
+	
+	30% {
+		transform: translateY(4vh) translateX(50vw) scale(0.6);
+	}
+	
+	40% {
+		transform: translateY(2vh) translateX(70vw) scale(0.6);
+	}
+	
+	50% {
+		transform: translateY(0vh) translateX(90vw) scale(0.6);
+	}
+	
+	60% {
+		transform: translateY(0vh) translateX(110vw) scale(0.6);
+	}
+	
+	100% {
+		transform: translateY(0vh) translateX(110vw) scale(0.6);
+	}
+	
+}

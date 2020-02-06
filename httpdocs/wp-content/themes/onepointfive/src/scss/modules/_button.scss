@@ -1,0 +1,38 @@
+#page button, #page input[type="submit"], #page .wp-block-button {
+	border:      none;
+	box-shadow:  none;
+	text-shadow: none;
+	padding:     4px;
+	color:       $color-b;
+	
+	a {
+		color:      $color-b;
+		padding:    8px 40px;
+		border:     solid 2px white;
+		transition: all .25s ease;
+		
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.67) !important;
+			color:            white;
+		}
+	}
+}
+
+input[type="submit"] {
+	background: $color-e;
+	border: solid 2px $color-e;
+	
+	&:hover {
+		background: darken($color-e, 2%);
+	}
+	
+	&:active {
+		background: darken($color-e, 3%);
+	}
+}
+
+@media only screen and (max-width: $bp-mobile){
+	.wp-block-button{
+		text-align: center;
+	}
+}

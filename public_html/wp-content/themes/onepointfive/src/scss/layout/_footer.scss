@@ -7,14 +7,19 @@ footer#colophon {
 	
 	img {
 		max-width: 100%;
-		width:     200px;
-		height:    auto;
+	    width: 100px;
+	    height: auto;
+	    margin: 0px 10px 0px 50px;
 	}
 	
 	a {
-		color: darken($color-d, 20%);
+		font-weight:bold;
+		text-decoration:underline;
+		color:#FFF;
 	}
-	
+	a:hover {
+		color:#1B9B05;
+	}
 	label {
 		font-weight: 200;
 	}
@@ -26,13 +31,11 @@ footer#colophon {
 		li {
 			float:left;
 			margin-right: 1em;
+
 		}
-		a:after {
-			content:      '\f054';
-			font-family:  "Font Awesome 5 Free";
-			font-weight:  900;
-			padding-left: 10px;
-			font-size:    12px;
+		a {
+			text-decoration:underline;
+			font-weight:normal;
 		}
 	}
 
@@ -42,9 +45,9 @@ footer#colophon {
 
 	
 	hr {
-		border-top: solid 2px darken($color-b, 10%);
+		
 		height:     1px;
-		background: lighten($color-b, 10%);
+		background: lighten(#1B9B05, 10%);
 	}
 	
 	svg{
@@ -101,7 +104,7 @@ footer#colophon {
 					color: lighten($color-b, 40%);
 					
 					&:hover {
-						color: lighten($color-b, 50%);
+						color: #1B9B05;
 					}
 				}
 			}

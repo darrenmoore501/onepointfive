@@ -13,7 +13,7 @@
 		<!-- DESKTOP NAVIGATION -->
 		<div class="logo col-12 col-xl-2">
 			<a href="/">
-			<img src="/wp-content/themes/onepointfive/dist/media/onepointfive.png" alt="onepointfive" width="180" height="120" />
+			<img src="/wp-content/themes/onepointfive/dist/media/15degrees.png" alt="onepointfive" width="180" height="120" />
 			</a>
 		</div>
 
@@ -28,7 +28,7 @@
 		<div id="mobile-menu-wrapper" class="menu mobile col-12 col-lg-10 d-block d-md-none">
 
 		<a href="/">
-			<img src="/wp-content/themes/onepointfive/dist/media/onepointfive.png" alt="onepointfive" width="180" height="120"  class="custom-logo"/>"
+			<img src="/wp-content/themes/onepointfive/dist/media/15degrees.png" alt="onepointfive" width="180" height="120"  class="custom-logo"/>"
 			</a>
 
 			<?php wp_nav_menu( array( 'menu' => 'mobile', 'menu_class' => 'mobile-menu' ) ); ?>

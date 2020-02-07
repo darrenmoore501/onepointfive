@@ -49,9 +49,7 @@ class Masthead {
    */
   private setupOpacityTimeline = () => {
     this.TLOpacity.add([
-      TweenLite.to(this.masthead, this.time, {
-        backgroundColor: 'rgba(20,38,49,0.65)'
-      })
+    
     ]);
   };
 

@@ -23,6 +23,10 @@ footer#colophon {
 		padding: 0;
 		list-style: none;
 		
+		li {
+			float:left;
+			margin-right: 1em;
+		}
 		a:after {
 			content:      '\f054';
 			font-family:  "Font Awesome 5 Free";

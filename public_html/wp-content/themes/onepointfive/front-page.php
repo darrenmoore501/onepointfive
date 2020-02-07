@@ -26,7 +26,7 @@ get_header();
 				<div class="row justify-content-center top" >
 						<div class="col-md-3 panel col-sm-3">
 						<h2>Carbon Footprinting</h2>
-					<p>The first step to become carbon neutral or even carbon negative is to measure your footprint. Use our proven technique as specificied by the UK Government to measure the footprint of your business and develop an action plan to reduce your footprint.</p>
+					<p>The first step to becoming carbon neutral or even carbon negative is to measure your footprint. Use our proven technique as specified by the UK Government to measure the footprint of your business and develop an action plan to reduce your footprint.</p>
 					<a href="/services/carbon-footprinting/">More</a>
 					</div>
 					<div class="col-md-3 panel col-sm-3">

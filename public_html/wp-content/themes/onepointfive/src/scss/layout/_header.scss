@@ -89,7 +89,7 @@ header#masthead {
 			left:           0;
 			top:            34px;
 			opacity:        0;
-			background-color: rgba(20,38,49,0);
+			background-color: rgba(255,255,255,0);
 			overflow:       hidden;
 			transition:     all .25s ease;
 			width:          200%;
@@ -112,7 +112,7 @@ header#masthead {
 		}
 		
 		&:hover ul.sub-menu {
-			background-color: rgba(20,38,49,0.8);
+			background-color: rgba(255,255,255,0.8);
 			opacity:0.8;
 			pointer-events: all;
 		}
@@ -120,7 +120,7 @@ header#masthead {
 	
 	&.scrolled {
 		.sub-menu {
-			background-color: rgba(20,38,49,0.8);
+			background-color: rgba(255,255,255,0.8);
 			border-top:       solid 2px white;
 		}
 	}

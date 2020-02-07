@@ -50,7 +50,7 @@
 	
 	
 	<header id="masthead" class="site-header" role="banner">
-			<a href="#" onclick="mute(); return false;">
-				<i class="fas fa-volume-mute"></i></a>
+			<!-- <a href="#" onclick="mute(); return false;">
+				<i class="fas fa-volume-mute"></i></a> -->
 		<?php get_template_part( 'template-parts/layout/layout', 'main-nav' ); ?>
 	</header>

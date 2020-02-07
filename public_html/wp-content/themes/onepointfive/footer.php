@@ -49,10 +49,10 @@
 <!-- The final curtain... -->
 
 </div><!-- End of page -->
-<audio id="birdsong" src="/wp-content/themes/onepointfive/src/media/birdsong.mp3" autoplay>
+<!-- <audio id="birdsong" src="/wp-content/themes/onepointfive/src/media/birdsong.mp3" autoplay>
 <p>Playing birdsong in the background.</p>
 <embed src="/wp-content/themes/onepointfive/src/media/birdsong.mp3" width="18" height="9" hidden="true" />
-</audio>
+</audio>-->
 
 <script>
 	

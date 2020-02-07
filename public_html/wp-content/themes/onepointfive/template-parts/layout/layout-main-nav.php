@@ -28,7 +28,7 @@
 		<div id="mobile-menu-wrapper" class="menu mobile col-12 col-lg-10 d-block d-md-none">
 
 		<a href="/">
-			<img src="/wp-content/themes/onepointfive/dist/media/15degrees.png" alt="onepointfive" width="180" height="120"  class="custom-logo"/>"
+			<img src="/wp-content/themes/onepointfive/dist/media/15degrees_white.png" alt="onepointfive" width="180" height="120"  class="custom-logo"/>"
 			</a>
 
 			<?php wp_nav_menu( array( 'menu' => 'mobile', 'menu_class' => 'mobile-menu' ) ); ?>

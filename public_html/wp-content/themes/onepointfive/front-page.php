@@ -43,8 +43,8 @@ get_header();
 				</div>
 					<div class="row justify-content-center top row3" >
 					<div class="col-md-6 abouttext col-sm-10">
-						<h2>About OnePointFive Degrees</h2>
-						<p>We set up <strong>OnePointFive</strong> to address one big issue. The biggest issue of our times. Work with onepointfive.io to bring make your business carbon neutral or even carbon negative by the end of the decade. Gain marketing and PR credibility, a competitive edge and cut waste and inneficiencies at the same time.</p>
+						<h2>About OnePointFive Comms </h2>
+						<p>We set up <strong>OnePointFive</strong> to address one big issue. The biggest issue of our times.<br /> Work with One Point Five Comms to bring make your business carbon neutral or even carbon negative by the end of the decade. Gain marketing and PR credibility, a competitive edge and cut waste and inefficiencies at the same time.</p>
 					<a href="/about/">More</a>
 					</div>
 					</div>

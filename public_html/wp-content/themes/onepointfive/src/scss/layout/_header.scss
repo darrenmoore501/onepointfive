@@ -46,19 +46,18 @@ header#masthead {
 					border-bottom: solid 2px transparent;
 					
 					&:hover{
-						color:#071999;
+						color:#337CA0;
 					}
 				}
 				
 				&.current-menu-item > a, &:hover > a, &.current-page-parent > a {
 					text-decoration: none;
-					border-color:    #071999;
+					border-color:    #337CA0;
 					transition:      all 0.25s ease;
-				}
-				
+				}	
 				&.cta {
 					a {
-						border:     solid 2px #071999;
+						border:     solid 2px #337CA0;
 						background: transparent;
 						
 						&:hover {
@@ -166,6 +165,11 @@ header#masthead  nav  #mobile-menu-wrapper {
 		color:white;
 	}
 }
-.parent-pageid-4180 header#masthead nav ul li#menu-item-4192 a {
+/*.parent-pageid-4180 header#masthead nav ul li#menu-item-4192 a {
     border-bottom: 2px solid #fff;
-}
+} */
+.current-page-ancestor > a, .current-page-ancestor:hover > a, .current-page-ancestor > a {
+	text-decoration: none;
+	border-color:    #337CA0;
+	transition:      all 0.25s ease;
+}	

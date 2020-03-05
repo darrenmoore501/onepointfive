@@ -191,10 +191,21 @@ footer#colophon {
 				width:     100%;
 				max-width: 100%;
 			}
+			.menu-footer-menu-container {
+				width: 90%;
+				margin: auto;
+			}
+			.menu-footer-menu-container {
+				text-align:center;
+			}
+			footer#colophon ul li {
+		    float: none;
+		    display: inline;
+		    white-space: nowrap;
+		    margin-right: 1em;
+			}
 		}
 		
-
-
 
 @keyframes fly-cycle {
 	

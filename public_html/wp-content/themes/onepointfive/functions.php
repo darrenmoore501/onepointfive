@@ -42,6 +42,7 @@
 			// This theme uses wp_nav_menu() in one location.
 			register_nav_menus( array(
 					'primary' => esc_html__( 'Primary', 'ecovolt' ),
+					'mobile-menu' => esc_html__( 'Mobile Menu', 'ecovolt' ),
 					'footer'  => esc_html__( 'Footer', 'ecovolt' ),
 				) );
 

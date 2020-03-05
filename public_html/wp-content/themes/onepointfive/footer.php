@@ -21,7 +21,7 @@
 	<div class="container-fluid main">
 				<div class="row text-center">
 					<div class="col-12">
-					<p class="text-center">Carbon negative web hosting. Full audit and minimisation of footprint. 10% of profits invested in tree planting projects.<br />One Point Five Comms Ltd: a carbon negative business. <a href="/about/">Find out how</a>.</p>
+					<p class="text-center">Carbon negative web hosting. Full audit and minimisation of footprint. 25% of profits invested in tree planting projects.<br />One Point Five Comms Ltd: a carbon negative business. <a href="/about/">Find out how</a>.</p>
 				</div>
 				
 			</div>

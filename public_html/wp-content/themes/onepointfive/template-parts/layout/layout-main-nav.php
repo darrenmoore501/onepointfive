@@ -31,7 +31,7 @@
 			<img src="/wp-content/themes/onepointfive/dist/media/15degrees_white.png" alt="onepointfive" width="180" height="120"  class="custom-logo"/>"
 			</a>
 
-			<?php wp_nav_menu( array( 'menu' => 'mobile', 'menu_class' => 'mobile-menu' ) ); ?>
+			<?php wp_nav_menu( array( 'menu' => 'mobile-menu', 'menu_class' => 'mobile-menu' ) ); ?>
 		</div>
 	</div>
 </nav>

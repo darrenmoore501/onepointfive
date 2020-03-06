@@ -49,18 +49,21 @@ main#primary {
 			margin:              0 auto;
 			padding:             10px 30px 12px;
 			border-radius:       50px;
-			background:          #337CA0;
-			
+	
+			background:#1B9B05;
+			border: 2px solid #fff;
 			background-size:     1px 500px;
 			background-position: 0 0;
 			color: white;
 			transition:          all 0.25s ease;
 			
 			&:hover {
+				background:          #337CA0;	
 				background-position: 0 -200px;
 			}
 			
 			&:active {
+				background:          #337CA0;
 				background-position: 0 -400px;
 			}
 		}

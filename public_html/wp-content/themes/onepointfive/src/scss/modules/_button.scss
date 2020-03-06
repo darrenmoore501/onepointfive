@@ -3,21 +3,19 @@
 	box-shadow:  none;
 	text-shadow: none;
 	padding:     4px;
-	color:       $color-b;
-	
+	color:       white;
+	margin: 0 auto 1em auto;
 	a {
-		color:      $color-b;
-		padding:    8px 40px;
 		border:     solid 2px white;
 		transition: all .25s ease;
-		
+	    background-color: #1B9B05 ;
+	    color:white;	
 		&:hover {
-			background-color: rgba(0, 0, 0, 0.67) !important;
+			background: #337ca0 !important;
 			color:            white;
 		}
 	}
 }
-
 input[type="submit"] {
 	background: $color-e;
 	border: solid 2px $color-e;

@@ -20,7 +20,9 @@ body {
 		color:#fff;
 		font-size: 40px;
 		font-family: 'Cabin', sans-serif;	
-		margin-top:50px;
+	    margin-top: 1em;
+		margin-bottom: 1em;
+
 	}
 	h2 {
 		color:#1B9B05;
@@ -30,10 +32,14 @@ body {
 	}
 	h3 {
 		font-family: 'Cabin', sans-serif;
-		color:white;		
+		color:white;
+	    margin-bottom: 1em;
+		margin-top: 0.5em;		
 	}
 	h4 {
 		color:white;
+	    margin-bottom: 1em;
+		margin-top: 0.5em;
 	}
 	IFRAME {
 		margin-bottom:2em;
@@ -75,6 +81,13 @@ body {
 			transition:          all 0.25s ease;
 		}
 	}
+	.footnote {
+		font-size: smaller;
+	    text-align: center;
+	    margin: 1em 1em 2em 1em;
+	    border: 1px solid teal;
+	    padding: 1em;
+	}
 	.no-margins{
 		margin: 0;
 	}
@@ -103,6 +116,14 @@ body {
 		h1 {
 			font-size: 50px
 		}
+	}
+	.feet {
+		width: 31px;
+		margin-right: 10px;
+	}
+	hr {
+    	border-top: 1px solid #337CA0;
+    	margin:1em 0;
 	}
 }
 a i.fa-volume-mute {

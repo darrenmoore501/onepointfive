@@ -1,0 +1,26 @@
+.pricing {
+	table {
+		background:white;
+		tr {
+			&:first-child {
+				background:#1b9b05;
+				color:white;
+				font-family:$font-a;
+				td {
+					border:1px solid white;
+				}
+			}
+			td {
+				padding:10px;
+				border:1px solid #1b9b05;
+			}
+		}
+	}
+}
+
+
+@media only screen and (max-width: $bp-mobile){
+	.wp-block-button{
+		text-align: center;
+	}
+}

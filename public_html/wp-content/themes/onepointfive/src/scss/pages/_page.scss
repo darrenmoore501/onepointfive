@@ -12,7 +12,13 @@ body {
 		padding: 0;
 		list-style-position:inside;
 	}
-	
+	.ebook_image {
+		transform: rotate(3deg);
+	    margin-bottom: 10px;
+	    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+	    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+	    box-shadow: 5px 5px 5px rgba(0, 0,0, 10);
+	}
 	p, li {
 		color:#2c2c2c;
 		font-weight: 200;

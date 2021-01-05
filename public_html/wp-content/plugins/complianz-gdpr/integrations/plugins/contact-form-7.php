@@ -1,5 +1,79 @@
 <?php
 defined( 'ABSPATH' ) or die( "you do not have acces to this page!" );
+function cmplz_cf7_initDomContentLoaded() {
+
+	if (class_exists('IQFix_WPCF7_Deity')) return;
+
+	$service = WPCF7_RECAPTCHA::get_instance();
+
+	if ( $service->is_active() ) {
+		if (version_compare(WPCF7_VERSION, 5.2, '>=')) {
+			?>
+			<script>
+				jQuery(document).ready(function ($) {
+					$(document).on("cmplzRunAfterAllScripts", cmplz_cf7_fire_domContentLoadedEvent);
+
+					function cmplz_cf7_fire_domContentLoadedEvent() {
+						wpcf7_recaptcha.execute = function (action) {
+							grecaptcha.execute(
+								wpcf7_recaptcha.sitekey,
+								{action: action}
+							).then(function (token) {
+								var event = new CustomEvent('wpcf7grecaptchaexecuted', {
+									detail: {
+										action: action,
+										token: token,
+									},
+								});
+
+								document.dispatchEvent(event);
+							});
+						};
+
+						wpcf7_recaptcha.execute_on_homepage = function () {
+							wpcf7_recaptcha.execute(wpcf7_recaptcha.actions['homepage']);
+						};
+
+						wpcf7_recaptcha.execute_on_contactform = function () {
+							wpcf7_recaptcha.execute(wpcf7_recaptcha.actions['contactform']);
+						};
+
+						grecaptcha.ready(
+							wpcf7_recaptcha.execute_on_homepage
+						);
+
+						document.addEventListener('change',
+							wpcf7_recaptcha.execute_on_contactform
+						);
+
+						document.addEventListener('wpcf7submit',
+							wpcf7_recaptcha.execute_on_homepage
+						);
+					}
+				})
+			</script>
+			<?php
+		} else {
+			?>
+			<script>
+				jQuery(document).ready(function ($) {
+					$(document).on("cmplzRunAfterAllScripts", cmplz_cf7_fire_domContentLoadedEvent);
+
+					function cmplz_cf7_fire_domContentLoadedEvent() {
+						//fire a DomContentLoaded event, so the Contact Form 7 reCaptcha integration will work
+						window.document.dispatchEvent(new Event("DOMContentLoaded", {
+							bubbles: true,
+							cancelable: true
+						}));
+					}
+				})
+			</script>
+			<?php
+		}
+	}
+}
+add_action( 'wp_footer', 'cmplz_cf7_initDomContentLoaded' );
+
 
 /**
  * Customize the error message on submission of the form before consent
@@ -11,12 +85,9 @@ defined( 'ABSPATH' ) or die( "you do not have acces to this page!" );
  */
 function cmplz_contactform7_errormessage( $message, $status ) {
 	if ( $status === 'spam' ) {
-		$accept_text = apply_filters( 'cmplz_accept_cookies_contactform7',
-			__( 'Click to accept marketing cookies and enable this form',
-				'complianz-gdpr' ) );
-		$message
-		             = '<div class="cmplz-blocked-content-notice cmplz-accept-cookies"><a href="#">'
-		               . $accept_text . '</a></div>';
+		$accept_text = apply_filters( 'cmplz_accept_cookies_contactform7', __( 'Click to accept marketing cookies and enable this form', 'complianz-gdpr' ) );
+		$message = '<span class="cmplz-blocked-content-notice cmplz-accept-marketing"><a href="#" role="button">'
+				  . $accept_text . '</a></span>';
 	}
 
 	return $message;
@@ -46,12 +117,29 @@ add_filter( 'cmplz_form_types', 'cmplz_contactform7_form_types' );
 
 add_filter( 'cmplz_dependencies', 'cmplz_contactform7_dependencies' );
 function cmplz_contactform7_dependencies( $tags ) {
+	if (class_exists('IQFix_WPCF7_Deity')) return $tags;
+
 	$service = WPCF7_RECAPTCHA::get_instance();
-
-	if ( $service->is_active() ) {
-		$tags['recaptcha/api.js'] = 'grecaptcha';
+	if (cmplz_get_value('block_recaptcha_service') === 'yes'){
+		if ( $service->is_active() ) {
+			if (version_compare(WPCF7_VERSION, 5.2, '>=')){
+				$tags['recaptcha/api.js'] = 'modules/recaptcha/script.js';
+			} else {
+				$tags['recaptcha/api.js'] = 'grecaptcha';
+			}
+		}
 	}
+	return $tags;
+}
 
+add_filter( 'cmplz_known_script_tags', 'cmplz_contactform7_script' );
+function cmplz_contactform7_script( $tags ) {
+	$service = WPCF7_RECAPTCHA::get_instance();
+	if (cmplz_get_value('block_recaptcha_service') === 'yes'){
+		if ( $service->is_active() ) {
+			$tags[] = 'modules/recaptcha/script.js';
+		}
+	}
 	return $tags;
 }
 
@@ -68,8 +156,7 @@ function cmplz_contactform7_get_plugin_forms( $input_forms ) {
 	$forms = get_posts( array( 'post_type' => 'wpcf7_contact_form' ) );
 	$forms = wp_list_pluck( $forms, "post_title", "ID" );
 	foreach ( $forms as $id => $title ) {
-		$input_forms[ 'cf7_' . $id ] = $title . " " . __( '(Contact form 7)',
-				'complianz-gdpr' );
+		$input_forms[ 'cf7_' . $id ] = $title . " " . __( '(Contact form 7)', 'complianz-gdpr' );
 	}
 
 	return $input_forms;
@@ -87,7 +174,7 @@ function cmplz_contactform7_add_consent_checkbox( $form_id ) {
 
 	$warning = 'acceptance_as_validation: on';
 	$label
-	         = sprintf( __( 'To submit this form, you need to accept our %sprivacy statement%s',
+	         = sprintf( __( 'To submit this form, you need to accept our %sPrivacy Statement%s',
 		'complianz-gdpr' ),
 		'<a href="' . COMPLIANZ::$document->get_permalink( 'privacy-statement',
 			'eu', true ) . '">', '</a>' );

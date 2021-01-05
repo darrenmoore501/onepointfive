@@ -51,7 +51,10 @@ Class reSmushit {
 	 */
 	public static function optimize($file_path = NULL, $is_original = TRUE) {
 		global $wp_version;
-
+		if(!file_exists($file_path) OR !is_file($file_path)) {
+			rlog('Error! Picture ' . str_replace(ABSPATH, '/', $file_path) . ' cannot be optimized, file is not found on disk.', 'WARNING');
+			return false;
+		}
 		if(filesize($file_path) > self::MAX_FILESIZE){
 			rlog('Error! Picture ' . str_replace(ABSPATH, '/', $file_path) . ' cannot be optimized, file size is above 5MB ('. reSmushitUI::sizeFormat(filesize($file_path)) .')', 'WARNING');
 			return false;
@@ -196,7 +199,7 @@ Class reSmushit {
 		$output = array();
 		$extraSQL = null;
 		if($attachment_id)
-			$extraSQL = "where $wpdb->postmeta.post_id = ". $attachment_id;
+			$extraSQL = "where $wpdb->postmeta.post_id = ". (int)($attachment_id);
 
 		$query = $wpdb->prepare( 
 			"select
@@ -332,8 +335,8 @@ Class reSmushit {
 		foreach($all_images as $image){
 			$tmp = array();
 			$tmp['ID'] = $image->ID;
-			$tmp['attachment_metadata'] = unserialize($image->file_meta);
-
+			$tmp['attachment_metadata'] = isset($image->file_meta) ? unserialize($image->file_meta) : array();
+			
 			if( !file_exists(get_attached_file( $image->ID )) ) {
 				$files_not_found[] = $tmp;
 				continue;
@@ -430,7 +433,11 @@ Class reSmushit {
 	public static function wasSuccessfullyUpdated($attachment_id){
 		if( self::getDisabledState( $attachment_id ))
 			return 'disabled';
+		if (!file_exists(get_attached_file( $attachment_id ))) {
 
+			rlog("Error! File " . get_attached_file( $attachment_id ) . " not found on disk.", 'WARNING');
+			return 'file_not_found';
+		}
 		if( filesize(get_attached_file( $attachment_id )) > self::MAX_FILESIZE){
 			return 'file_too_big';
 		}

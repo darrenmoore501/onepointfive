@@ -127,15 +127,17 @@ if ( ! class_exists( "CMPLZ_SERVICE" ) ) {
 
 		/**
 		 * Saves the data for a given service, ore creates a new one if no ID was passed.
-		 *
+		 * @param bool $updateAllLanguages
+		 * @param bool   $forceWizardUpdate
 		 */
-
-		public function save( $updateAllLanguages = false ) {
+		public function save( $updateAllLanguages = false, $forceWizardUpdate = true) {
 			if ( strlen( $this->name ) == 0 ) {
 				return;
 			}
 
-			$this->add_to_wizard( $this->name );
+			if ($forceWizardUpdate) $this->add_to_wizard( $this->name );
+
+			cmplz_register_translation($this->serviceType, 'service_type');
 
 			$update_array = array(
 				'name'                => sanitize_text_field( $this->name ),
@@ -370,7 +372,7 @@ if ( ! class_exists( "CMPLZ_SERVICE" ) ) {
 				}
 				$translated_service->category          = $category;
 				$translated_service->isTranslationFrom = $parent_ID;
-				$translated_service->save();
+				$translated_service->save(false, false);
 
 				if ( $return_language && $language == $return_language ) {
 					$return_id = $translated_service->ID;

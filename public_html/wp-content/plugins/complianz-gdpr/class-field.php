@@ -18,8 +18,8 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 
 			self::$_this = $this;
-
-			add_action( 'plugins_loaded', array( $this, 'process_save' ), 20 );
+			//safe before the fields are loaded in config, in init
+			add_action( 'plugins_loaded', array( $this, 'process_save' ), 14 );
 			add_action( 'cmplz_register_translation',
 				array( $this, 'register_translation' ), 10, 2 );
 
@@ -60,7 +60,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				$string );
 		}
 
-
 		public function load() {
 			$this->default_args = array(
 				"fieldname"          => '',
@@ -80,6 +79,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				'media'              => true,
 				'first'              => false,
 				'warn'               => false,
+				'cols'               => false,
 			);
 
 
@@ -89,7 +89,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
-
 			if ( isset( $_POST['complianz_nonce'] ) ) {
 				//check nonce
 				if ( ! isset( $_POST['complianz_nonce'] )
@@ -142,18 +141,33 @@ if ( ! class_exists( "cmplz_field" ) ) {
 					$this->save_multiple( $fieldnames );
 				}
 
+				//Save the custom URL's for not Complianz generated pages.
+				$docs = COMPLIANZ::$document->get_document_types();
+				foreach ($docs as $document){
+					if (isset($_POST["cmplz_".$document."_custom_page"])){
+						$doc_id = intval($_POST["cmplz_".$document."_custom_page"]);
+						update_option("cmplz_".$document."_custom_page", $doc_id );
+						//if we have an actual privacy statement, custom, set it as privacy url for WP
+						if ($document==='privacy-statement' && $doc_id > 0){
+							COMPLIANZ::$document->set_wp_privacy_policy($doc_id, 'privacy-statement');
+						}
+					}
+					if (isset($_POST["cmplz_".$document."_custom_page_url"])){
+						$url = esc_url_raw($_POST["cmplz_".$document."_custom_page_url"]);
+						update_option("cmplz_".$document."_custom_page_url", $url );
+					}
+				}
+
 				//save data
-				$posted_fields = array_filter( $_POST,
-					array( $this, 'filter_complianz_fields' ),
-					ARRAY_FILTER_USE_KEY );
+				$posted_fields = array_filter( $_POST, array( $this, 'filter_complianz_fields' ), ARRAY_FILTER_USE_KEY );
 				foreach ( $posted_fields as $fieldname => $fieldvalue ) {
 					$this->save_field( $fieldname, $fieldvalue );
 				}
-
-				//we're assuming the page is the same for all fields here, as it's all on the same page (or should be)
-
+				do_action('cmplz_after_saved_all_fields', $posted_fields );
 			}
 		}
+
+
 
 		/**
 		 * santize an array for save storage
@@ -273,13 +287,18 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 		}
 
+		/**
+		 * Save the field
+		 * @param string $fieldname
+		 * @param mixed $fieldvalue
+		 */
 
 		public function save_field( $fieldname, $fieldvalue ) {
-
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
 
+			$fieldvalue = apply_filters("cmplz_fieldvalue", $fieldvalue, $fieldname);
 			$fields    = COMPLIANZ::$config->fields();
 			$fieldname = str_replace( "cmplz_", '', $fieldname );
 
@@ -290,9 +309,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 
 			$type     = $fields[ $fieldname ]['type'];
 			$page     = $fields[ $fieldname ]['source'];
-			$required = isset( $fields[ $fieldname ]['required'] )
-				? $fields[ $fieldname ]['required'] : false;
-
+			$required = isset( $fields[ $fieldname ]['required'] ) ? $fields[ $fieldname ]['required'] : false;
 			$fieldvalue = $this->sanitize( $fieldvalue, $type );
 
 			if ( ! $this->is_conditional( $fieldname ) && $required
@@ -306,8 +323,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				if ( isset( $fields[ $fieldname ]['translatable'] )
 				     && $fields[ $fieldname ]['translatable']
 				) {
-					do_action( 'cmplz_register_translation', $fieldname,
-						$fieldvalue );
+					do_action( 'cmplz_register_translation', $fieldname, $fieldvalue );
 				}
 			}
 
@@ -315,18 +331,15 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			if ( ! is_array( $options ) ) {
 				$options = array();
 			}
-			$prev_value = isset( $options[ $fieldname ] )
-				? $options[ $fieldname ] : false;
-			do_action( "complianz_before_save_" . $page . "_option", $fieldname,
-				$fieldvalue, $prev_value, $type );
+			$prev_value = isset( $options[ $fieldname ] ) ? $options[ $fieldname ] : false;
+			do_action( "complianz_before_save_" . $page . "_option", $fieldname, $fieldvalue, $prev_value, $type );
 			$options[ $fieldname ] = $fieldvalue;
 
 			if ( ! empty( $options ) ) {
 				update_option( 'complianz_options_' . $page, $options );
 			}
 
-			do_action( "complianz_after_save_" . $page . "_option", $fieldname,
-				$fieldvalue, $prev_value, $type );
+			do_action( "complianz_after_save_" . $page . "_option", $fieldname, $fieldvalue, $prev_value, $type );
 		}
 
 
@@ -381,8 +394,17 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 		}
 
+		/**
+		 * Sanitize a field
+		 * @param $value
+		 * @param $type
+		 *
+		 * @return array|bool|int|string|void
+		 */
 		public function sanitize( $value, $type ) {
-
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return false;
+			}
 			switch ( $type ) {
 				case 'colorpicker':
 					return sanitize_hex_color( $value );
@@ -400,12 +422,13 @@ if ( ! class_exists( "cmplz_field" ) ) {
 					return $value;
 				case 'email':
 					return sanitize_email( $value );
-				case 'css':
-					return $value;
 				case 'url':
 					return esc_url_raw( $value );
 				case 'number':
 					return intval( $value );
+				case 'css':
+				case 'javascript':
+					return  $value ;
 				case 'editor':
 				case 'textarea':
 					return wp_kses_post( $value );
@@ -448,6 +471,8 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			$hidden_class    = ( $args['hidden'] ) ? 'hidden' : '';
 			$first_class     = ( $args['first'] ) ? 'first' : '';
 			$type            = $args['type'] === 'notice' ? '' : $args['type'];
+			$cols            = $args['cols'];
+			$cols_class = $cols ? "cmplz-cols-$cols" : '';
 
 			$this->get_master_label( $args );
 			if ( $args['table'] ) {
@@ -461,11 +486,11 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				                  . esc_attr( $condition_answer ) . '"' : '';
 				echo '><th scope="row">';
 			} else {
-				echo '<div class="field-group ' . esc_attr( $args['fieldname']
-				                                            . ' ' . $type . ' '
-				                                            . $hidden_class
-				                                            . ' ' . $first_class
-				                                            . ' '
+				echo '<div class="field-group ' . esc_attr( $args['fieldname'] . ' '
+	                                            . esc_attr( $cols_class ) . ' '
+				                                            .'cmplz-'. $type . ' '
+				                                            . $hidden_class . ' '
+				                                            . $first_class . ' '
 				                                            . $condition_class )
 				     . '" ';
 				echo $condition ? 'data-condition-question="'
@@ -506,9 +531,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 		function after_label(
 			$args
 		) {
-//            if ($args['optional']) {
-//                echo '<span class="cmplz-optional">' . __("(Optional)", 'complianz-gdpr') . '</span>';
-//            }
 			if ( $args['table'] ) {
 				echo '</th><td>';
 			} else {
@@ -587,7 +609,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				} ?>"
 				placeholder="<?php echo esc_html( $args['placeholder'] ) ?>"
 				type="text"
-				pattern="^(http(s)?(:\/\/))?(www\.)?[#a-zA-Z0-9-_\.\/]+"
+				pattern="^(http(s)?(:\/\/))?(www\.)?[#a-zA-Z0-9-_\.\/\:]+"
 				value="<?php echo esc_html( $value ) ?>"
 				name="<?php echo esc_html( $fieldname ) ?>">
 			<?php do_action( 'complianz_after_field', $args ); ?>
@@ -679,7 +701,9 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				placeholder="<?php echo esc_html( $args['placeholder'] ) ?>"
 				type="number"
 				value="<?php echo esc_html( $value ) ?>"
-				name="<?php echo esc_html( $fieldname ) ?>">
+				name="<?php echo esc_html( $fieldname ) ?>"
+				min="0" step="<?php echo isset($args["validation_step"]) ? intval($args["validation_step"]) : 1?>"
+				>
 			<?php do_action( 'complianz_after_field', $args ); ?>
 			<?php
 		}
@@ -767,24 +791,35 @@ if ( ! class_exists( "cmplz_field" ) ) {
 					) {
 						$sel_key = false;
 						if ( ! $has_selection ) {
-							$sel_key = $default_index;
+							if (is_array($default_index)) {
+								if ($default_index[$option_key] == 1) {
+									$sel_key = $option_key;
+								}
+							} else {
+								$sel_key = $default_index;
+
+							}
+
 						} elseif ( isset( $value[ $option_key ] )
 						           && $value[ $option_key ]
 						) {
 							$sel_key = $option_key;
 						}
+						$disabled = '';
+						if (is_array($args['disabled']) && in_array($option_key, $args['disabled'])) {
+							$disabled = 'disabled';
+						}
 						?>
 						<div>
 							<input
 								name="<?php echo esc_html( $fieldname ) ?>[<?php echo $option_key ?>]"
-								type="hidden" value=""/>
-							<input class="<?php if ( $args['required'] ) {
+								type="hidden" value="<?php echo $disabled && ( (string) ( $sel_key == (string) $option_key ) ) ? 1 : ''?>"/>
+							<input <?php echo $disabled?> class="<?php if ( $args['required'] ) {
 								echo 'is-required';
 							} ?>"
 							       name="<?php echo esc_html( $fieldname ) ?>[<?php echo $option_key ?>]"
 							       size="40" type="checkbox"
-							       value="1" <?php echo ( (string) ( $sel_key
-							                                         == (string) $option_key ) )
+							       value="1" <?php echo ( (string) ( $sel_key == (string) $option_key ) )
 								? "checked" : "" ?> >
 							<label>
 								<?php echo esc_html( $option_label ) ?>
@@ -805,8 +840,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			$args
 		) {
 			$fieldname = 'cmplz_' . $args['fieldname'];
-			$value     = $this->get_value( $args['fieldname'],
-				$args['default'] );
+			$value     = $this->get_value( $args['fieldname'], $args['default'] );
 			$options   = $args['options'];
 
 			if ( ! $this->show_field( $args ) ) {
@@ -816,21 +850,26 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			?>
 			<?php do_action( 'complianz_before_label', $args ); ?>
 
-			<label
-				for="<?php echo $args['fieldname'] ?>"><?php echo $args['label'] ?><?php echo $this->get_help_tip_btn( $args ); ?></label>
+			<label for="<?php echo $args['fieldname'] ?>"><?php echo $args['label'] ?><?php echo $this->get_help_tip_btn( $args ); ?></label>
 
 			<?php do_action( 'complianz_after_label', $args ); ?>
 			<div class="cmplz-validate-radio">
 				<?php
 				if ( ! empty( $options ) ) {
 					if ( $args['disabled'] ) {
-						echo '<input type="hidden" value="' . $args['default']
-						     . '" name="' . $fieldname . '">';
+						echo '<input type="hidden" value="' . $args['default'] . '" name="' . $fieldname . '">';
 					}
 					foreach ( $options as $option_value => $option_label ) {
 						?>
-						<input <?php if ( $args['disabled'] )
-							echo "disabled" ?>
+						<input <?php
+							if ( !is_array($args['disabled']) ) {
+								if ($args['disabled']) echo "disabled";
+							} else {
+								if ( in_array($option_value, $args['disabled'] ) ) {
+									echo "disabled";
+								}
+							}
+								?>
 							<?php if ( $args['required'] ) {
 								echo "required";
 							} ?>
@@ -853,6 +892,121 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			<?php do_action( 'complianz_after_field', $args ); ?>
 			<?php
 		}
+
+		public
+		function document(
+			$args
+		) {
+			$fieldname = 'cmplz_' . $args['fieldname'];
+			$value     = $this->get_value( $args['fieldname'], $args['default'] );
+			$doc_args = array(
+				'post_type' => 'page',
+				'posts_per_page' => -1,
+			);
+			$pages = get_posts($doc_args);
+			$pages = wp_list_pluck($pages, 'post_title','ID' );
+			$custom_page_id = get_option('cmplz_'.$args['fieldname'].'_custom_page');
+			if ( ! $this->show_field( $args ) ) {
+				return;
+			}
+
+			/**
+			 * If there's no active privacy statement, use the wp privacy statement, if available
+			 */
+			if ( $args['fieldname'] === 'privacy-statement' && !$custom_page_id ){
+				$wp_privacy_policy = get_option('wp_page_for_privacy_policy');
+				if ($wp_privacy_policy){
+					$custom_page_id = $wp_privacy_policy;
+				}
+			}
+
+			?>
+			<?php do_action( 'complianz_before_label', $args ); ?>
+			<label for="<?php echo $args['fieldname'] ?>"><?php printf(__("Select how you want to add your %s.",'complianz-gdpr'), $args['label']) ?><?php echo $this->get_help_tip_btn( $args ); ?></label>
+			<?php do_action( 'complianz_after_label', $args ); ?>
+
+			<div class="cmplz-validate-radio cmplz-document-field" data-fieldname="<?php echo esc_html( $fieldname ) ?>">
+				<input <?php if ( $args['disabled'] )
+					echo "disabled" ?>
+					<?php if ( $args['required'] ) {
+						echo "required";
+					} ?>
+					type="radio"
+					name="<?php echo esc_html( $fieldname ) ?>"
+					value="generated" <?php if ( $value == 'generated'
+				)
+					echo "checked" ?> class="cmplz-document-input">
+				<label class="">
+					<?php
+						if ($fieldname === 'cmplz_cookie-statement'){
+							echo apply_filters("cmplz_generate_document_label", __("Generated by Complianz", "complianz-gdpr"), $args['fieldname']);
+						} else {
+							echo apply_filters("cmplz_generate_document_label", sprintf(__("Generate a comprehensive and legally validated %s with %spremium%s", "complianz-gdpr"), $args['label'],'<a href="https://complianz.io/l/pricing/" target="_blank">', '</a>' ), $args['fieldname']);
+						}
+					 ?>
+				</label>
+				<div class="clear"></div>
+
+				<input
+					<?php if ( $args['required'] ) {
+						echo "required";
+					} ?>
+					type="radio"
+					name="<?php echo esc_html( $fieldname ) ?>"
+					value="custom"
+					<?php if ( $value == 'custom' )
+					echo "checked" ?> class="cmplz-document-input">
+				<label class="">
+					<?php _e("Link to custom page", "complianz-gdpr"); ?>
+				</label>
+
+				<div class="clear"></div>
+				<input
+					<?php if ( $args['required'] ) {
+						echo "required";
+					} ?>
+					type="radio"
+					name="<?php echo esc_html( $fieldname ) ?>"
+					value="url"
+					<?php if ( $value == 'url' )
+						echo "checked" ?> class="cmplz-document-input">
+				<label class="">
+					<?php _e("Custom URL", "complianz-gdpr"); ?>
+				</label>
+				<div class="clear"></div>
+
+				<?php if ( $args['fieldname'] !== 'cookie-statement' ){?>
+					<input
+						<?php if ( $args['required'] ) {
+							echo "required";
+						} ?>
+						type="radio"
+						name="<?php echo esc_html( $fieldname ) ?>"
+						value="none"
+						<?php if ( $value == 'none' )
+							echo "checked" ?> class="cmplz-document-input">
+					<label class="">
+						<?php printf( __("No document", "complianz-gdpr"), $args['label'] ); ?>
+					</label>
+					<div class="clear"></div>
+				<?php } ?>
+				<input type="text" class="cmplz-document-custom-url" value="<?php echo get_option($fieldname."_custom_page_url")?>" placeholder = "https://domain.com/your-policy" name="<?php echo esc_html( $fieldname."_custom_page_url" ) ?>">
+
+				<select class="cmplz-document-custom-page" name="<?php echo esc_html( $fieldname."_custom_page" ) ?>">
+					<option value=""><?php _e("None selected", "complianz-gdpr")?></option>
+
+					<?php foreach ($pages as $ID => $page){
+						$selected = $ID==$custom_page_id ? "selected" : "";
+						?>
+						<option value="<?php echo $ID?>" <?=$selected?>><?php echo $page?></option>
+					<?php } ?>
+				</select>
+			</div>
+
+			<?php do_action( 'complianz_after_field', $args ); ?>
+			<?php
+		}
+
 
 		public
 		function show_field(
@@ -902,7 +1056,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 
 			//function callbacks
-			$maybe_is_function = str_replace( 'NOT ', '', $args[ $type ] );
+			$maybe_is_function = is_string($args[ $type ]) ? str_replace( 'NOT ', '', $args[ $type ] ) : '';
 			if ( ! is_array( $args[ $type ] ) && ! empty( $args[ $type ] )
 			     && function_exists( $maybe_is_function )
 			) {
@@ -1174,11 +1328,15 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			<?php
 		}
 
-
-		public
-		function step_has_fields(
-			$page, $step = false, $section = false
-		) {
+		/**
+		 * Check if a step has any fields
+		 * @param string $page
+		 * @param bool $step
+		 * @param bool $section
+		 *
+		 * @return bool
+		 */
+		public function step_has_fields( $page, $step = false, $section = false ) {
 
 			$fields = COMPLIANZ::$config->fields( $page, $step, $section );
 			foreach ( $fields as $fieldname => $args ) {
@@ -1229,6 +1387,9 @@ if ( ! class_exists( "cmplz_field" ) ) {
 						break;
 					case 'text':
 						$this->text( $args );
+						break;
+					case 'document':
+						$this->document( $args );
 						break;
 					case 'button':
 						$this->button( $args );
@@ -1590,13 +1751,13 @@ if ( ! class_exists( "cmplz_field" ) ) {
 		 * @return string
 		 */
 
-		private function get_language_descriptor( $language ) {
-
+		private function get_language_descriptor( $language, $type = 'cookie' ) {
+			$string = $type =='cookie' ? __( 'Cookies in %s', 'complianz-gdpr' ) : __( 'Services in %s', 'complianz-gdpr' );
 			if ( isset( COMPLIANZ::$config->language_codes[ $language ] ) ) {
-				$string = sprintf( __( 'Cookies in %s', 'complianz-gdpr' ),
+				$string = sprintf( $string ,
 					COMPLIANZ::$config->language_codes[ $language ] );
 			} else {
-				$string = sprintf( __( 'Cookies in %s', 'complianz-gdpr' ),
+				$string = sprintf( $string,
 					strtoupper( $language ) );
 			}
 
@@ -1639,7 +1800,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 						)
 							echo "selected" ?>>
 							<?php
-							echo $this->get_language_descriptor( $language );
+							echo $this->get_language_descriptor( $language , 'service');
 							?></option>
 					<?php } ?>
 				</select>
@@ -1722,7 +1883,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
                         </div>
                         <div>
                             <label>'
-					        . sprintf( __( 'Select the processing agreement you made with this %s, or %screate one%s',
+					        . sprintf( __( 'Select the Processing Agreement you made with this %s, or %screate one%s',
 							'complianz-gdpr' ), $args['label'],
 							$create_processing_agreement_link, '</a>' ) . '</label>
                         </div>
@@ -1734,7 +1895,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 					        . __( 'No agreement selected', 'complianz-gdpr' ) . '</option>
                                     <option value="-1" '
 					        . $processing_agreement_outside_c . '>'
-					        . __( 'A processing agreement outside Complianz Privacy Suite',
+					        . __( 'A Processing Agreement outside Complianz Privacy Suite',
 							'complianz-gdpr' ) . '</option>';
 					foreach ( $processing_agreements as $id => $title ) {
 						$selected = ( intval( $value['processing_agreement'] )
@@ -1843,7 +2004,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
                     <div class="multiple-field">
                         <div>
                             <label>'
-					        . __( 'Name of the third party with whom you share the data',
+					        . __( 'Name of the Third Party with whom you share the data',
 							'complianz-gdpr' ) . '</label>
                         </div>
                         <div>
@@ -1855,7 +2016,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
                         </div>
 
                         <div>
-                            <label>' . __( 'Third party country',
+                            <label>' . __( 'Third Party country',
 							'complianz-gdpr' ) . '</label>
                         </div>
                         <div>
@@ -1909,7 +2070,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			?>
 			<button class="button" type="submit"
 			        class="cmplz-add-new-thirdparty" name="cmplz_add_multiple"
-			        value="<?php echo esc_html( $args['fieldname'] ) ?>"><?php _e( "Add new third-party",
+			        value="<?php echo esc_html( $args['fieldname'] ) ?>"><?php _e( "Add new Third Party",
 					'complianz-gdpr' ) ?></button>
 			<?php do_action( 'complianz_after_field', $args ); ?>
 			<?php

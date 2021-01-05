@@ -14,29 +14,35 @@ if ( ! class_exists( "cmplz_amp" ) ) {
 			}
 
 			self::$_this = $this;
-
-			add_filter( 'amp_post_template_data',
-				array( $this, 'enqueue_amp_assets' ), 10 );
-
-			add_action( 'amp_post_template_footer',
-				array( $this, 'get_amp_banner' ), 9999 );
+			add_filter( 'amp_post_template_data', array( $this, 'enqueue_amp_assets' ), 10 );
+			add_action( 'amp_post_template_footer', array( $this, 'get_amp_banner' ), 9999 );
 			add_action( 'wp_footer', array( $this, 'get_amp_banner' ), 9999 );
-			add_action( 'wp_ajax_cmplz_amp_endpoint',
-				array( $this, 'amp_endpoint' ) );
-			add_action( 'wp_ajax_nopriv_cmplz_amp_endpoint',
-				array( $this, 'amp_endpoint' ) );
-
+			add_action( 'wp_ajax_cmplz_amp_endpoint', array( $this, 'amp_endpoint' ) );
+			add_action( 'wp_ajax_nopriv_cmplz_amp_endpoint', array( $this, 'amp_endpoint' ) );
 			add_action( 'amp_post_template_css', array( $this, 'amp_styles' ) );
-
 			add_action( 'plugins_loaded', array( $this, 'init' ), 11 );
-			add_action( 'cmplz_amp_tags',
-				array( $this, 'handle_anonymous_settings' ) );
-
+			add_action( 'cmplz_amp_tags', array( $this, 'handle_anonymous_settings' ) );
+			add_action('wp', array($this, 'custom_amp_css') );
 		}
 
 		static function this() {
 			return self::$_this;
 		}
+
+		public function custom_amp_css(){
+
+			if ( ! cmplz_is_amp() ) {
+				return;
+			}
+			wp_register_style( 'cmplz_amp_css', false );
+			wp_enqueue_style( 'cmplz_amp_css' );
+			ob_start();
+			$this->amp_styles($post=false);;
+			$css = ob_get_clean();
+			wp_add_inline_style( 'cmplz_amp_css', $css );
+		}
+
+
 
 		/**
 		 * If set up anonymously, remove the analytics tag
@@ -94,8 +100,7 @@ if ( ! class_exists( "cmplz_amp" ) ) {
 				return;
 			}
 
-			$consentHrefUrl = add_query_arg( 'action', 'cmplz_amp_endpoint',
-				admin_url( 'admin-ajax.php' ) );
+			$consentHrefUrl = add_query_arg( 'action', 'cmplz_amp_endpoint', admin_url( 'admin-ajax.php' ) );
 
 			//amp only accepts https or //
 			$consentHrefUrl = str_replace( "http://", "//", $consentHrefUrl );
@@ -188,7 +193,7 @@ if ( ! class_exists( "cmplz_amp" ) ) {
 				) {
 				}
 			}
-			wp_send_json( [ 'promptIfUnknown' => $active ], 200 );
+			wp_send_json( array('promptIfUnknown' => $active ), 200 );
 		}
 
 

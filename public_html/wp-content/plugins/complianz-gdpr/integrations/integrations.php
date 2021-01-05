@@ -11,132 +11,265 @@ if ( is_admin() ) {
 
 global $cmplz_integrations_list;
 $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
-	//user registration plugin
+	'advanced-nocaptcha-recaptcha' => array(
+			'constant_or_function' => 'ANR_PLUGIN_VERSION',
+			'label'                => 'Advanced noCaptcha & invisible Captcha',
+			'firstparty_marketing' => false,
+	),
+
+	'invisible-recaptcha' => array(
+			'constant_or_function' => 'InvisibleReCaptcha',
+			'label'                => 'Google Invisible reCaptcha voor WordPress',
+			'firstparty_marketing' => false,
+	),
+
+	'nudgify'          => array(
+		'constant_or_function' => 'NUDGIFY_PLUGIN_VERSION',
+		'label'                => 'Nudgify',
+		'firstparty_marketing' => false,
+	),
+
+	'generatepress-maps'          => array(
+		'constant_or_function' => 'GeneratePress',
+		'label'                => 'GeneratePress Maps',
+		'firstparty_marketing' => false,
+	),
+
+	'volocation'          => array(
+		'constant_or_function' => 'VOSL_VERSION',
+		'label'                => 'VO Locator',
+		'firstparty_marketing' => false,
+	),
+
+	'trustpulse'          => array(
+		'constant_or_function' => 'TRUSTPULSE_PLUGIN_VERSION',
+		'label'                => 'TrustPulse',
+		'firstparty_marketing' => false,
+	),
+
 	'addtoany'          => array(
 		'constant_or_function' => 'A2A_SHARE_SAVE_init',
 		'label'                => 'Add To Any',
+		'firstparty_marketing' => false,
 	),
+
 	'amp'               => array(
 		'constant_or_function' => 'AMP__VERSION',
 		'label'                => 'AMP (official AMP plugin for WordPress)',
+		'firstparty_marketing' => false,
 	),
+
+	'podcast-player'         => array(
+		'constant_or_function' => 'PODCAST_PLAYER_VERSION',
+		'label'                => 'Podcast Player',
+		'firstparty_marketing' => false,
+	),
+
+	'google-maps-easy'               => array(
+		'constant_or_function' => 'toeGetClassNameGmp',
+		'label'                => 'Google Maps Easy',
+		'firstparty_marketing' => false,
+	),
+
+	'activecampaign'               => array(
+		'constant_or_function' => 'ACTIVECAMPAIGN_URL',
+		'label'                => 'Active Campaign',
+		'firstparty_marketing' => true,
+	),
+
+	'google-site-kit'               => array(
+		'constant_or_function' => 'GOOGLESITEKIT_VERSION',
+		'label'                => 'Google Site Kit',
+	),
+
 	'beehive'           => array(
 		'constant_or_function' => 'BEEHIVE_PRO',
 		'label'                => 'Beehive',
+		'firstparty_marketing' => false,
 	),
+
+	'simple-business-directory' => array(
+		'constant_or_function' => 'QCSBD_DIR',
+		'label'                => 'Simple Business Directory',
+		'firstparty_marketing' => false,
+	),
+
+	'acf'           => array(
+		'constant_or_function' => 'ACF',
+		'label'                => 'Advanced Custom Fields',
+		'firstparty_marketing' => false,
+	),
+
 	'pixelyoursite'     => array(
 		'constant_or_function' => 'PYS_FREE_VERSION',
 		'label'                => 'PixelYourSite',
+		'firstparty_marketing' => false,
 	),
+
 	'user-registration' => array(
 		'constant_or_function' => 'UR',
 		'label'                => 'User Registration',
+		'firstparty_marketing' => false,
 	),
+
 	'contact-form-7'    => array(
 		'constant_or_function' => 'WPCF7_VERSION',
 		'label'                => 'Contact Form 7',
+		'firstparty_marketing' => false,
 	),
 
 	'facebook-for-wordpress' => array(
 		'constant_or_function' => 'FacebookPixelPlugin\\FacebookForWordpress',
 		'label'                => 'Official Facebook Pixel',
+		'firstparty_marketing' => false,
+	),
+
+	'facebook-for-woocommerce' => array(
+		'constant_or_function' => 'facebook_for_woocommerce',
+		'label'                => 'Facebook for WooCommerce',
+		'firstparty_marketing' => false,
 	),
 
 	'google-tagmanager-for-wordpress' => array(
 		'constant_or_function' => 'GTM4WP_VERSION',
 		'label'                => 'Google Tag Manager for WordPress',
+		'firstparty_marketing' => false,
 	),
 
 	'jetpack' => array(
 		'constant_or_function' => 'JETPACK__VERSION',
 		'label'                => 'JetPack',
+		'firstparty_marketing' => false,
 	),
 
 	'g1-gmaps' => array(
 		'constant_or_function' => 'G1_GMaps',
 		'label'                => 'G1 GMAPS',
+		'firstparty_marketing' => false,
 	),
 
 	'monsterinsights' => array(
 		'constant_or_function' => 'MonsterInsights',
 		'label'                => 'MonsterInsights',
+		'firstparty_marketing' => false,
 	),
 
 	'mappress' => array(
 		'constant_or_function' => 'Mappress',
 		'label'                => 'MapPress Maps for WordPress',
+		'firstparty_marketing' => false,
+	),
+
+	'map-multi-marker' => array(
+		'constant_or_function' => 'MapMultiMarker',
+		'label'                => 'Map Multi Marker',
+		'firstparty_marketing' => false,
 	),
 
 	'caos-host-analytics-local' => array(
 		'constant_or_function' => 'CAOS_STATIC_VERSION',
 		'label'                => 'CAOS host analytics locally',
 
+		'firstparty_marketing' => false,
 	),
 	'wp-google-maps'            => array(
 		'constant_or_function' => 'WPGMZA_VERSION',
 		'label'                => 'WP Google Maps',
+		'firstparty_marketing' => false,
 	),
 
+	'woocommerce-google-analytics-pro' => array(
+		'constant_or_function' => 'WC_Google_Analytics_Pro_Loader',
+		'label'                => 'Woocommerce Google Analytics Pro',
+		'firstparty_marketing' => false,
+	),
+	'woocommerce-google-analytics-integration' => array(
+		'constant_or_function' => 'WC_Google_Analytics_Integration',
+		'label'                => 'Woocommerce Google Analytics Integration',
+		'firstparty_marketing' => false,
+	),
 	'geo-my-wp' => array(
 		'constant_or_function' => 'GMW_VERSION',
 		'label'                => 'Geo My WP',
+		'firstparty_marketing' => false,
 	),
 
 	'google-analytics-dashboard-for-wp' => array(
 		'constant_or_function' => 'EXACTMETRICS_VERSION',
 		'label'                => 'Google Analytics Dashboard for WP',
+		'firstparty_marketing' => false,
 	),
 
 	'wp-google-maps-widget' => array(
 		'constant_or_function' => 'GMW_PLUGIN_DIR',
 		'label'                => 'Maps Widget for Google Maps',
+		'firstparty_marketing' => false,
 	),
 
 	'wp-donottrack' => array(
 		'constant_or_function' => 'wp_donottrack_config',
 		'label'                => 'WP Do Not Track',
+		'firstparty_marketing' => false,
 	),
 
 	'pixel-caffeine'   => array(
 		'constant_or_function' => 'AEPC_PIXEL_VERSION',
 		'label'                => 'Pixel Caffeine',
+		'firstparty_marketing' => false,
 	),
 
-	//Super Socializer
+	'rate-my-post'   => array(
+		'constant_or_function' => 'RATE_MY_POST_VERSION',
+		'label'                => 'Rate My Post',
+		'firstparty_marketing' => false,
+	),
+
 	'super-socializer' => array(
 		'constant_or_function' => 'THE_CHAMP_SS_VERSION',
 		'label'                => 'Super Socializer',
-
+		'firstparty_marketing' => false,
 	),
 
-	//Tidio Live Chat
 	'tidio-live-chat'  => array(
 		'constant_or_function' => 'TIDIOCHAT_VERSION',
 		'label'                => 'Tidio Live Chat',
-
+		'firstparty_marketing' => false,
 	),
-	//Instagram feed / Smash balloon social photo feed
+
 	'instagram-feed'   => array(
 		'constant_or_function' => 'SBIVER',
-		'label'                => 'Instagram Feed',
+		'label'                => 'Smash Balloon Instagram Feed',
+		'firstparty_marketing' => false,
 	),
 
+	'facebook-feed'   => array(
+		'constant_or_function' => 'CFFVER',
+		'label'                => 'Smash Balloon Facebook Feed',
+		'firstparty_marketing' => false,
+	),
 
-	//Sumo
+	'twitter-feed'   => array(
+		'constant_or_function' => 'CTF_VERSION',
+		'label'                => 'Smash Balloon Twitter Feed',
+		'firstparty_marketing' => false,
+	),
+
 	'sumo'             => array(
 		'constant_or_function' => 'SUMOME__PLUGIN_DIR',
 		'label'                => 'Sumo – Boost Conversion and Sales',
+		'firstparty_marketing' => false,
 	),
 
-	//WP Forms
 	'wpforms'          => array(
 		'constant_or_function' => 'wpforms',
 		'label'                => 'WP Forms',
+		'firstparty_marketing' => false,
 	),
 
 	'wp-rocket' => array(
 		'constant_or_function' => 'WP_ROCKET_VERSION',
 		'label'                => 'WP Rocket',
+		'firstparty_marketing' => false,
 	),
 
 	'forminator' => array(
@@ -146,31 +279,32 @@ $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
 		'callback_condition'   => array(
 			'regions' => array( 'eu', 'uk' ),
 		),
+		'firstparty_marketing' => false,
 
 	),
 
 	'happyforms' => array(
 		'constant_or_function' => 'HAPPYFORMS_VERSION',
 		'label'                => 'Happy Forms',
+		'firstparty_marketing' => false,
 	),
 
 	'osm' => array(
 		'constant_or_function' => 'OSM_PLUGIN_URL',
 		'label'                => 'OSM - OpenStreetMap',
+		'firstparty_marketing' => false,
 	),
 
 	'so-widgets-bundle' => array(
 		'constant_or_function' => 'SOW_BUNDLE_VERSION',
 		'label'                => 'SiteOrigin Widgets Bundle',
+		'firstparty_marketing' => false,
 	),
 
 	'gravity-forms' => array(
 		'constant_or_function' => 'GF_MIN_WP_VERSION',
 		'label'                => 'Gravity Forms',
-		'callback_condition'   => array(
-			'privacy-statement' => 'yes',
-			'regions'           => 'eu',
-		),
+		'firstparty_marketing' => false,
 	),
 ) );
 
@@ -226,24 +360,43 @@ function cmplz_is_integration_enabled( $plugin_name ) {
 }
 
 /**
+ * Check if a plugin from the integrations list is active
+ * @param $plugin
+ *
+ * @return bool
+ */
+function cmplz_integration_plugin_is_active( $plugin ){
+
+	global $cmplz_integrations_list;
+	if ( !isset($cmplz_integrations_list[ $plugin ]) ) return false;
+
+	//because we need a default, we don't use the get_value from complianz. The fields array is not loaded yet, so there are no defaults
+	$fields = get_option( 'complianz_options_integrations' );
+	$details = $cmplz_integrations_list[ $plugin ];
+	$enabled = isset( $fields[ $plugin ] ) ? $fields[ $plugin ] : true;
+	$theme = wp_get_theme();
+	if ( ( defined( $details['constant_or_function'] )
+	       || function_exists( $details['constant_or_function'] )
+	       || class_exists( $details['constant_or_function'] ) )
+	       || ( $theme && ($theme->name === $details['constant_or_function']) )
+	     && $enabled
+	) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * code loaded without privileges to allow integrations between plugins and services, when enabled.
  */
 
 function cmplz_integrations() {
 
 	global $cmplz_integrations_list;
-
-	$fields = get_option( 'complianz_options_integrations' );
 	foreach ( $cmplz_integrations_list as $plugin => $details ) {
-		//because we need a default, we don't use the get_value from complianz. The fields array is not loaded yet, so there are no defaults
-		$enabled = isset( $fields[ $plugin ] ) ? $fields[ $plugin ] : true;
-		if ( ( defined( $details['constant_or_function'] )
-		       || function_exists( $details['constant_or_function'] )
-		       || class_exists( $details['constant_or_function'] ) )
-		     && $enabled
-		) {
-			$file = apply_filters( 'cmplz_integration_path',
-				cmplz_path . "integrations/plugins/$plugin.php", $plugin );
+		if ( cmplz_integration_plugin_is_active( $plugin ) ) {
+			$file = apply_filters( 'cmplz_integration_path', cmplz_path . "integrations/plugins/$plugin.php", $plugin );
 			if ( file_exists( $file ) ) {
 				require_once( $file );
 			} else {
@@ -286,7 +439,7 @@ function cmplz_integrations() {
 	 * advertising
 	 */
 
-	if ( cmplz_get_value( 'uses_ad_cookies' ) ) {
+	if ( cmplz_get_value( 'uses_ad_cookies' ) === 'yes' ) {
 		require_once( 'services/advertising.php' );
 	}
 
@@ -515,6 +668,8 @@ function cmplz_get_service_by_src( $src ) {
 		$type = 'soundcloud';
 	} else if ( strpos( $src, 'twitter' ) !== false ) {
 		$type = 'twitter';
+	} else if ( strpos( $src, 'calendly' ) !== false ) {
+		$type = 'calendly';
 	}
 
 	if ( ! $type ) {
@@ -528,12 +683,3 @@ function cmplz_get_service_by_src( $src ) {
 
 	return $type;
 }
-
-
-/**
- * Translation updates
- *
- */
-__( 'Audio, electronic, visual, thermal, olfactory, or simular information',
-	'complianz-gdpr' );
-

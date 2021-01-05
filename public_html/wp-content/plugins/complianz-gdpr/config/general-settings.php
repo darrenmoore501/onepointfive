@@ -8,7 +8,7 @@ $this->fields = $this->fields + array(
 			'type'     => 'checkbox',
 			'label'    => __( "Use geolocation", 'complianz-gdpr' ),
 			'comment'  => $this->premium_geo_ip
-			              . __( 'If enabled, the cookie warning will not show for countries without a cookie law, and will adjust the warning type depending on supported privacy laws',
+			              . __( 'If enabled, the cookie warning will not show for countries without a cookie law, and will adjust consent management depending on supported privacy laws',
 					'complianz-gdpr' ),
 			'table'    => true,
 			'disabled' => true,
@@ -22,7 +22,7 @@ $this->fields = $this->fields + array(
 			'type'     => 'checkbox',
 			'label'    => __( "Enable A/B testing", 'complianz-gdpr' ),
 			'comment'  => $this->premium_ab_testing
-			              . __( 'If enabled, the plugin will track which cookie warning has the best conversion rate.',
+			              . __( 'If enabled, the plugin will track which cookie banner has the best conversion rate.',
 					'complianz-gdpr' ),
 			'table'    => true,
 			'disabled' => true,
@@ -40,7 +40,6 @@ $this->fields = $this->fields + array(
 			'disabled'  => true,
 			'condition' => array( 'a_b_testing' => true ),
 			'default'   => 30,
-			//setting this to true will set it always to true, as the get_cookie settings will see an empty value
 		),
 
 		'cookie_expiry' => array(
@@ -53,13 +52,71 @@ $this->fields = $this->fields + array(
 			'table'   => true,
 		),
 
+		'disable_cookie_block' => array(
+			'source'  => 'settings',
+			'type'    => 'checkbox',
+			'table'   => true,
+			'label'   => __( "Enable safe mode", 'complianz-gdpr' ),
+			'default' => false,
+			'comment'    => sprintf( __( 'When safe mode is enabled, all integrations will be disabled temporarily, please read %sthese instructions%s to debug the issue or ask support if needed.',
+				'complianz-gdpr' ),
+				'<a  target="_blank" href="https://complianz.io/debugging-issues/">', '</a>' )
+
+		),
+
+		'dont_use_placeholders' => array(
+			'source'    => 'settings',
+			'type'      => 'checkbox',
+			'table'     => true,
+			'label'     => __( "Disable placeholder insertion",
+				'complianz-gdpr' ),
+			'default'   => false,
+			'comment'      => __( "If you experience styling issues with videos or iFrames you can disable the placeholder insertion, which in some themes can conflict with theme styling.",
+				'complianz-gdpr' ),
+			'condition' => array(
+				'disable_cookie_block' => false,
+			),
+		),
+
+		'disable_automatic_cookiescan' => array(
+			'source'  => 'settings',
+			'step'    => 'general',
+			'type'    => 'checkbox',
+			'default' => false,
+			'label'   => __("Disable the automatic cookie scan.","complianz-gdpr"),
+			'help'      => __( "You can disable the monthly automatic cookie scan here, and do only manual cookie scans.","complianz-gdpr"),
+			'table'   => true,
+		),
+
+		'set_cookies_on_root' => array(
+			'source'  => 'settings',
+			'step'    => 'general',
+			'type'    => 'checkbox',
+			'default' => false,
+			'label'   => '',
+			'help'    => '',
+			'table'   => true,
+			'condition' => array( 'hide_field' => true ),
+		),
+
+		'cookie_domain' => array(
+			'source'  => 'settings',
+			'step'    => 'general',
+			'type'    => 'text',
+			'default' => false,
+			'label'   => '',
+			'help'    => '',
+			'table'   => true,
+			'condition' => array( 'hide_field' => true ),
+		),
+
 		'use_document_css' => array(
 			'source'  => 'settings',
 			'type'    => 'checkbox',
-			'label'   => __( "Use document CSS", 'complianz-gdpr' ),
+			'label'   => __( "Use document CSS by Complianz", 'complianz-gdpr' ),
 			'table'   => true,
 			'default' => true,
-			'help'    => __( "Disable if you don't want the default Complianz document CSS to load",
+			'comment'    => __( "Disable to let your theme take over.",
 				'complianz-gdpr' ),
 		),
 
@@ -77,46 +134,18 @@ $this->fields = $this->fields + array(
 			'source'    => 'settings',
 			'type'      => 'css',
 			'label'     => __( "Custom document CSS", 'complianz-gdpr' ),
-			'default'   => '#cmplz-document h3 {} /* titles in complianz documents */'
-			               . "\n"
-			               . '#cmplz-document .subtitle {} /* subtitles */'
-			               . "\n"
-			               . '#cmplz-document h3.annex{} /* titles in annexes */'
-			               . "\n"
-			               . '#cmplz-document .subtitle.annex{} /* subtitles in annexes */'
-			               . "\n"
-			               . '#cmplz-document, #cmplz-document p, #cmplz-document span, #cmplz-document li {} /* text */'
-			               . "\n"
-			               . '#cmplz-document table {} /* table styles */'
-			               . "\n" . '#cmplz-document td {} /* row styles */',
+			'default'   => '#cmplz-document h2 {} /* titles in complianz documents */'
+				. "\n" . '#cmplz-document .subtitle {} /* subtitles */'
+				. "\n" . '#cmplz-document h2.annex{} /* titles in annexes */'
+				. "\n" . '#cmplz-document .subtitle.annex{} /* subtitles in annexes */'
+				. "\n" . '#cmplz-document, #cmplz-document p, #cmplz-document span, #cmplz-document li {} /* text */'
+                . "\n" . '#cmplz-cookies-overview .cmplz-service-header {} /* service header in cookie policy */'
+                . "\n" . '#cmplz-cookies-overview .cmplz-service-desc {} /* service description */'
+				. "\n" . '#cmplz-document.impressum, #cmplz-document.cookie-statement, #cmplz-document.privacy-statement {} /* styles for impressum */',
 			'help'      => __( 'Add your own custom document css here',
 				'complianz-gdpr' ),
 			'table'     => true,
 			'condition' => array( 'use_custom_document_css' => true ),
-		),
-
-		'disable_cookie_block' => array(
-			'source'  => 'settings',
-			'type'    => 'checkbox',
-			'label'   => __( "Disable cookie blocker", 'complianz-gdpr' ),
-			'default' => false,
-			'help'    => __( 'Not recommended. You can disable the brute force blocking of third party scripts if you encounter issues with styling on your front-end.',
-				'complianz-gdpr' ),
-			'table'   => true,
-		),
-
-		'dont_use_placeholders' => array(
-			'source'    => 'settings',
-			'type'      => 'checkbox',
-			'table'     => true,
-			'label'     => __( "Disable placeholder insertion",
-				'complianz-gdpr' ),
-			'default'   => false,
-			'help'      => __( "If you experience styling issues with video's or iframes you can disable the placeholder insertion, which in some themes can conflict with theme styling.",
-				'complianz-gdpr' ),
-			'condition' => array(
-				'disable_cookie_block' => false,
-			)
 		),
 
 		'blocked_content_text' => array(
@@ -127,7 +156,7 @@ $this->fields = $this->fields + array(
 			'label'        => __( "Blocked content text", 'complianz-gdpr' ),
 			'default'      => _x( 'Click to accept marketing cookies and enable this content',
 				'Accept cookies on blocked content', 'complianz-gdpr' ),
-			'help'         => __( 'The blocked content text appears when for example a Youtube video is embedded. Because Youtube places cookie which require consent, the video will be blocked initially, with an explanatory text.',
+			'comment'         => __( 'The blocked content text appears when for example a Youtube video is embedded.',
 				'complianz-gdpr' ),
 			'condition'    => array(
 				'disable_cookie_block' => false,
@@ -145,6 +174,16 @@ $this->fields = $this->fields + array(
 			'disabled' => false,
 			'default'  => false,
 			//setting this to true will set it always to true
+		),
+
+		'enable_cookieblocker_ajax' => array(
+			'step'     => 'general',
+			'source'   => 'settings',
+			'type'     => 'checkbox',
+			'label'    => __( "Enable cookie blocker for ajax loaded content", 'complianz-gdpr' ),
+			'table'    => true,
+			'disabled' => false,
+			'default'  => false,
 		),
 
 		'notification_from_email' => array(

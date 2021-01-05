@@ -15,55 +15,62 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 			}
 
 			self::$_this = $this;
-			add_action( 'admin_enqueue_scripts',
-				array( $this, 'enqueue_assets' ) );
-			add_action( 'admin_menu', array( $this, 'register_admin_page' ),
-				20 );
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+			add_action( 'admin_menu', array( $this, 'register_admin_page' ), 20 );
 
 			$plugin = cmplz_plugin;
-			add_filter( "plugin_action_links_$plugin",
-				array( $this, 'plugin_settings_link' ) );
+			add_filter( "plugin_action_links_$plugin", array( $this, 'plugin_settings_link' ) );
 			//multisite
-			add_filter( "network_admin_plugin_action_links_$plugin",
-				array( $this, 'plugin_settings_link' ) );
+			add_filter( "network_admin_plugin_action_links_$plugin", array( $this, 'plugin_settings_link' ) );
 
 			//Add actions for dashboard components
-			add_action( "cmplz_dashboard_third_block",
-				array( $this, 'dashboard_third_block' ) );
-			add_action( "cmplz_dashboard_footer",
-				array( $this, 'dashboard_footer' ) );
-			add_action( "cmplz_dashboard_second_block",
-				array( $this, 'dashboard_second_block' ) );
-			add_action( "cmplz_documents_footer",
-				array( $this, 'documents_footer' ) );
+			add_action( "cmplz_dashboard_third_block", array( $this, 'dashboard_third_block' ) );
+			add_action( "cmplz_dashboard_footer", array( $this, 'dashboard_footer' ) );
+			add_action( "cmplz_dashboard_second_block", array( $this, 'dashboard_second_block' ) );
+			add_action( "cmplz_documents_footer", array( $this, 'documents_footer' ) );
 			add_action( "cmplz_documents", array( $this, 'documents' ) );
 
 			//some custom warnings
-			add_filter( 'cmplz_warnings_types',
-				array( $this, 'filter_warnings' ) );
-
+			add_filter( 'cmplz_warnings_types', array( $this, 'filter_warnings' ) );
 			add_action( 'cmplz_tools', array( $this, 'dashboard_tools' ) );
-
 			add_action( 'admin_init', array( $this, 'check_upgrade' ), 10, 2 );
-
 			add_action( 'cmplz_show_message', array( $this, 'show_message' ) );
-
-			add_action( 'admin_init', array( $this, 'process_reset_action' ),
-				10, 1 );
+			add_action( 'admin_init', array( $this, 'process_reset_action' ), 10, 1 );
 
 			if ( get_option( 'cmplz_show_cookiedatabase_optin' ) ) {
-				add_action( 'admin_notices',
-					array( $this, 'notice_optin_on_upgrade' ) );
+				add_action( 'admin_notices', array( $this, 'notice_optin_on_upgrade' ) );
 			}
 
+			add_action('cmplz_fieldvalue', array($this, 'filter_cookie_domain'), 10, 2);
 		}
 
 		static function this() {
 			return self::$_this;
-
-
 		}
 
+		/**
+		 * Sanitize the cookiedomain
+		 * @param $fieldname
+		 * @param $fieldvalue
+		 * @param $fieldvalue
+		 *
+		 * @return string|string[]
+		 */
+
+		public function filter_cookie_domain($fieldvalue, $fieldname){
+			if (!current_user_can('manage_options')) return $fieldvalue;
+			//sanitize the cookie domain
+			if ( ( $fieldname === 'cmplz_cookie_domain' && strlen($fieldvalue)>0 )
+			) {
+				$fieldvalue = str_replace(array("https://", "http://", "www."), "", $fieldvalue);
+			}
+
+			return $fieldvalue;
+		}
+
+		/**
+		 * process the reset
+		 */
 
 		public function process_reset_action() {
 
@@ -96,7 +103,6 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				'cmplz_license_key',
 				'cmplz_license_status',
 				'cmplz_changed_cookies',
-				'cmplz_license_notice_dismissed',
 				'cmplz_plugins_changed',
 				'cmplz_detected_stats',
 				'cmplz_deleted_cookies',
@@ -156,48 +162,8 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 		public function check_upgrade() {
 			//when debug is enabled, a timestamp is appended. We strip this for version comparison purposes.
 			$prev_version = get_option( 'cmplz-current-version', false );
-//            if (defined("SCRIPT_DEBUG") && SCRIPT_DEBUG) $prev_version = substr($prev_version,0, 5);
 
-
-			//set a default region if this is an upgrade:
-			if ( $prev_version
-			     && version_compare( $prev_version, '2.0.1', '<' )
-			) {
-				$regions = cmplz_get_value( 'regions' );
-				if ( empty( $regions ) ) {
-					if ( defined( 'cmplz_free' ) ) {
-						cmplz_update_option( 'wizard', 'regions', 'eu' );
-					}
-				}
-			}
-
-			/*
-			 * Set the value of the US cookie banner message on upgrade
-			 * copy message text to message_us
-			 * */
-
-			if ( $prev_version
-			     && version_compare( $prev_version, '2.1.2', '<' )
-			) {
-				$settings               = get_option( 'complianz_options_cookie_settings' );
-				$settings['message_us'] = $settings['message'];
-				update_option( 'complianz_options_cookie_settings', $settings );
-			}
-
-			/*
-			 * If the legal documents have changed, we notify the user of this.
-			 *
-			 * */
-
-			if ( CMPLZ_LEGAL_VERSION > get_option( 'cmplz_legal_version',
-					0 )
-			) {
-				update_option( 'cmplz_plugin_new_features', true );
-				update_option( 'cmplz_legal_version', CMPLZ_LEGAL_VERSION );
-			}
-
-
-			/*
+			/**
 			 * Migrate use_country and a_b_testing to general settings
 			 *
 			 * */
@@ -284,7 +250,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 			     && version_compare( $prev_version, '3.0.8', '<' )
 			) {
 				$wizard_settings                       = get_option( 'complianz_options_wizard' );
-				$wizard_settings['cookie-policy-type'] = 'default';
+				$wizard_settings['cookie-statement'] = 'generated';
 				update_option( 'complianz_options_wizard', $wizard_settings );
 			}
 
@@ -420,20 +386,160 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				}
 			}
 
+			/**
+			 * upgrade to new custom and generated document settings
+			 */
+			if (  $prev_version
+			     && version_compare( $prev_version, '4.4.0', '<' )
+			) {
+				//upgrade cookie policy setting to new field
+				$wizard_settings = get_option( 'complianz_options_wizard' );
+				if ( isset($wizard_settings["cookie-policy-type"]) ){
+					$value = $wizard_settings["cookie-policy-type"];
+					unset($wizard_settings["cookie-policy-type"]);
+					//upgrade cookie policy custom url
+					if ($value === 'custom') {
+						$url     = cmplz_get_value( 'custom-cookie-policy-url' );
+						update_option( "cmplz_cookie-statement_custom_page", $url );
+						unset($wizard_settings["custom-cookie-policy-url"]);
+					} else {
+						$value = 'generated';
+					}
+				} else {
+					$value = 'generated';
+				}
+
+				$wizard_settings['cookie-statement'] = $value;
+				$wizard_settings['impressum'] = 'none';
+
+				//upgrade privacy statement settings
+				$value = $wizard_settings["privacy-statement"];
+
+				if ( $value === 'yes' ) {
+					$value = 'generated';
+				} else {
+					$wp_privacy_policy = get_option('wp_page_for_privacy_policy');
+					if ($wp_privacy_policy) {
+						$value = 'custom';
+						update_option("cmplz_privacy-statement_custom_page", $wp_privacy_policy);
+					} else {
+						$value = 'none';
+					}
+				}
+				$wizard_settings['privacy-statement'] = $value;
+
+				//upgrade disclaimer settings
+				$value = $wizard_settings["disclaimer"];
+				if ($value==='yes'){
+					$value = 'generated';
+				} else {
+					$value = 'none';
+				}
+				$wizard_settings['disclaimer'] = $value;
+
+				//save the data
+				update_option( 'complianz_options_wizard', $wizard_settings );
+			}
+
+			/**
+			 * upgrade to new category field
+			 */
+			if (  $prev_version
+			      && version_compare( $prev_version, '4.6.0', '<' )
+			) {
+				$banners = cmplz_get_cookiebanners();
+				if ( $banners ) {
+					foreach ( $banners as $banner_item ) {
+						$banner = new CMPLZ_COOKIEBANNER( $banner_item->ID, false );
+						$banner->banner_version++;
+						if ($banner->use_categories ) {
+							$banner->use_categories = 'legacy';
+						} else {
+							$banner->use_categories = 'no';
+						}
+						if ($banner->use_categories_optinstats) {
+							$banner->use_categories_optinstats = 'legacy';
+						} else {
+							$banner->use_categories_optinstats = 'no';
+						}
+						//also set the deny button to banner color, to make sure users start with correct colors
+						$banner->functional_background_color = $banner->popup_background_color;
+						$banner->functional_border_color = $banner->popup_background_color;
+						$banner->functional_text_color = $banner->popup_text_color;
+						$banner->save();
+					}
+				}
+			}
+
+			/**
+			 * migrate policy id to network option for multisites
+			 */
+
+			if (  $prev_version && version_compare( $prev_version, '4.6.7', '<' )
+			) {
+				if (is_multisite()) update_site_option( 'complianz_active_policy_id', get_option( 'complianz_active_policy_id', 1 ));
+			}
+
+			/**
+			 * migrate odd numbers
+			 */
+			if (  $prev_version && version_compare( $prev_version, '4.6.8', '<' )
+			) {
+				$banners = cmplz_get_cookiebanners();
+				if ( $banners ) {
+					foreach ( $banners as $banner_item ) {
+						$banner = new CMPLZ_COOKIEBANNER( $banner_item->ID );
+						if($banner->banner_width % 2 == 1) $banner->banner_width++;
+						$banner->save();
+					}
+				}
+			}
+
+			/**
+			 * new progress option default
+			 */
+
+			if (  $prev_version && version_compare( $prev_version, '4.6.10.1', '<' ) ){
+				if (get_option( 'cmplz_sync_cookies_complete' )) update_option( 'cmplz_sync_cookies_after_services_complete', true );
+			}
+
+			if (  $prev_version
+			     && version_compare( $prev_version, '4.7.1', '<' )
+			) {
+				//upgrade cookie policy setting to new field
+				$wizard_settings = get_option( 'complianz_options_wizard' );
+				$wizard_settings['block_recaptcha_service'] = 'yes';
+				update_option( 'complianz_options_wizard', $wizard_settings );
+			}
+
 			do_action( 'cmplz_upgrade', $prev_version );
 
 			update_option( 'cmplz-current-version', cmplz_version );
 		}
 
-
+		/**
+		 * Check if new features are shipped with the plugin
+		 *
+		 * @return mixed|void
+		 */
 		public function complianz_plugin_has_new_features() {
 			return get_option( 'cmplz_plugin_new_features' );
 		}
 
+		/**
+		 * Reset the new features option
+		 *
+		 * @return bool
+		 */
 		public function reset_complianz_plugin_has_new_features() {
 			return update_option( 'cmplz_plugin_new_features', false );
 		}
 
+		/**
+		 * Enqueue some assets
+		 *
+		 * @param $hook
+		 */
 		public function enqueue_assets( $hook ) {
 			if ( ( strpos( $hook, 'complianz' ) === false )
 			     && strpos( $hook, 'cmplz' ) === false
@@ -606,6 +712,16 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 					$warnings[] = 'complianz-gdpr-feature-update';
 				}
 
+				if ( COMPLIANZ::$cookie_admin->site_needs_cookie_warning() && get_option('cmplz_detected_console_errors') ) {
+					//clear all other errors, as this one is important
+					$warnings = array();
+					$warnings[] = 'console-errors';
+				}
+
+				if ( COMPLIANZ::$cookie_admin->site_needs_cookie_warning() && get_option('cmplz_detected_missing_jquery') ) {
+					$warnings[] = 'no-jquery';
+				}
+
 				$warnings = apply_filters( 'cmplz_warnings', $warnings );
 
 				set_transient( 'complianz_warnings', $warnings,
@@ -639,7 +755,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				'manage_options',
 				'complianz',
 				array( $this, 'main_page' ),
-				cmplz_url . 'assets/images/menu-icon.png',
+				cmplz_url . 'assets/images/menu-icon.svg',
 				CMPLZ_MAIN_MENU_POSITION
 			);
 
@@ -688,21 +804,17 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 			if ( defined( 'cmplz_free' ) && cmplz_free ) {
 				global $submenu;
 				$class                  = 'cmplz-submenu';
+				$highest_index = count($submenu['complianz']);
 				$submenu['complianz'][] = array(
-					__( 'Upgrade to premium', 'complianz-gdpr' ),
-					'manage_options',
-					'https://complianz.io/l/pricing'
+						__( 'Upgrade to premium', 'complianz-gdpr' ),
+						'manage_options',
+						'https://complianz.io/l/pricing'
 				);
-				if ( isset( $submenu['complianz'][6] ) ) {
-					if ( ! empty( $submenu['complianz'][6][4] ) ) // Append if css class exists
-					{
-						$submenu['complianz'][6][4] .= ' ' . $class;
-					} else {
-						$submenu['complianz'][6][4] = $class;
-					}
+				if ( isset( $submenu['complianz'][$highest_index] ) ) {
+					if (! isset ($submenu['complianz'][$highest_index][4])) $submenu['complianz'][$highest_index][4] = '';
+					$submenu['complianz'][$highest_index][4] .= ' ' . $class;
 				}
 			}
-
 
 		}
 
@@ -782,7 +894,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 								"</a>" ); ?>
 					</li>
 					<li>
-						<i class="fas fa-plus"></i><?php echo __( "Create processing agreement",
+						<i class="fas fa-plus"></i><?php echo __( "Create Processing Agreement",
 								'complianz-gdpr' ) . " "
 						                                      . sprintf( __( '(%spremium%s)',
 								'complianz-gdpr' ),
@@ -878,7 +990,9 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 							if ( ! COMPLIANZ::$document->page_required( $page,
 								$region )
 							) {
-								$this->get_dashboard_element( sprintf( __( "Obsolete page, you can delete %s" ),
+								$this->get_dashboard_element( sprintf( __( "Obsolete page, you can delete %s",
+											'complianz-gdpr'),
+
 									$link, $img ), 'error' );
 							} else {
 								$sync_status
@@ -913,7 +1027,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 						} elseif ( COMPLIANZ::$document->page_required( $page,
 							$region )
 						) {
-							$this->get_dashboard_element( sprintf( __( "You should create a %s" ),
+							$this->get_dashboard_element( sprintf( __( "You should create a %s", "complianz-gdpr"),
 								$page['title'], $img ), 'error' );
 						}
 					}
@@ -995,7 +1109,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 					class="cmplz-footer-title"><?php echo __( 'Really Simple SSL',
 						'complianz-gdpr' ); ?></div>
 				<div
-					class="cmplz-footer-description"><?php echo __( 'Trusted by over 3 million WordPress users',
+					class="cmplz-footer-description"><?php echo __( 'Trusted by over 5 million WordPress users',
 						'complianz-gdpr' ); ?></div>
 				<a href="https://really-simple-ssl.com" target="_blank">
 					<div class="cmplz-external-btn">
@@ -1204,11 +1318,11 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 							if ( COMPLIANZ::$cookie_admin->site_needs_cookie_warning()
 							     && COMPLIANZ::$wizard->wizard_completed_once()
 							) {
-								$this->get_dashboard_element( __( 'Your site requires a cookie warning, which has been enabled',
+								$this->get_dashboard_element( __( 'Your site requires a cookie banner, which has been enabled.',
 									'complianz-gdpr' ), 'success' );
 							}
 							if ( ! COMPLIANZ::$cookie_admin->site_needs_cookie_warning() ) {
-								$this->get_dashboard_element( __( 'Your site does not require a cookie warning. No cookie warning has been enabled.',
+								$this->get_dashboard_element( __( 'Your site does not require a cookie banner. No cookie banner has been enabled.',
 									'complianz-gdpr' ), 'success' );
 							}
 							if ( $last_cookie_scan ) {

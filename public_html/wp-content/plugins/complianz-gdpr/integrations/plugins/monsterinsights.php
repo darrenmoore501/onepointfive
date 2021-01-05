@@ -15,6 +15,17 @@ function cmplz_monsterinsights_set_default( $value, $fieldname ) {
 }
 
 /**
+ * Block all premium scripts as well
+ *
+ * */
+function cmplz_monsterinsights_script( $tags ) {
+	$tags[] = 'monsterinsights_scroll_tracking_load';
+	$tags[] = 'google-analytics-premium/pro/assets/';
+	return $tags;
+}
+add_filter( 'cmplz_known_script_tags', 'cmplz_monsterinsights_script' );
+
+/**
  * Remove stuff which is not necessary anymore
  *
  * */
@@ -51,8 +62,7 @@ function cmplz_monsterinsights_add_monsterinsights_attributes( $attr ) {
 	return $attr;
 }
 
-add_filter( 'monsterinsights_tracking_analytics_script_attributes',
-	'cmplz_monsterinsights_add_monsterinsights_attributes', 10, 1 );
+add_filter( 'monsterinsights_tracking_analytics_script_attributes', 'cmplz_monsterinsights_add_monsterinsights_attributes', 10, 1 );
 
 
 function cmplz_monsterinsights_compile_statistics_notice() {
@@ -62,7 +72,7 @@ function cmplz_monsterinsights_compile_statistics_notice() {
 	}
 
 	if ( cmplz_statistics_no_sharing_allowed() ) {
-		cmplz_notice( __( "You have selected you do not share data with third party networks. Demographics is now disabled in MonsterInsights.",
+		cmplz_notice( __( "You have selected you do not share data with third-party networks. Demographics is now disabled in MonsterInsights.",
 			'complianz-gdpr' ) );
 	}
 }
@@ -85,8 +95,7 @@ add_action( 'after_setup_theme',
 /**
  * Execute the monsterinsights script at the right point
  */
-add_action( 'cmplz_before_statistics_script', 'monsterinsights_tracking_script',
-	10, 1 );
+add_action( 'cmplz_before_statistics_script', 'monsterinsights_tracking_script', 10, 1 );
 
 
 /**
@@ -100,7 +109,6 @@ add_action( 'cmplz_before_statistics_script', 'monsterinsights_tracking_script',
 function cmplz_monsterinsights_filter_fields( $fields ) {
 	unset( $fields['configuration_by_complianz'] );
 	unset( $fields['UA_code'] );
-
 	return $fields;
 }
 
@@ -143,8 +151,7 @@ function cmplz_monsterinsights_force_anonymize_ips( $value, $key, $default ) {
 	return $value;
 }
 
-add_filter( 'monsterinsights_get_option_anonymize_ips',
-	'cmplz_monsterinsights_force_anonymize_ips', 30, 3 );
+add_filter( 'monsterinsights_get_option_anonymize_ips', 'cmplz_monsterinsights_force_anonymize_ips', 30, 3 );
 
 /**
  * Make sure Monsterinsights returns false for third party sharing when this option is selected in the wizard
@@ -166,8 +173,3 @@ function cmplz_monsterinsights_force_demographics( $value, $key, $default ) {
 
 add_filter( 'monsterinsights_get_option_demographics',
 	'cmplz_monsterinsights_force_demographics', 30, 3 );
-
-
-
-
-

@@ -19,13 +19,11 @@ function cmplz_mapppress_css() {
 	<style>
 		.mapp-main .cmplz-placeholder-element {
 			height: 100%;
+			width: 100%;
 		}
 	</style>
 	<?php
 }
-
-;
-
 
 /**
  * Add placeholder to the list

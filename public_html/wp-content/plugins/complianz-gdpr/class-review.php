@@ -15,6 +15,10 @@ if ( ! class_exists( "cmplz_review" ) ) {
 			}
 
 			self::$_this = $this;
+
+			//uncomment for testing
+//			update_option('cmplz_review_notice_shown', false);
+//			update_option( 'cmplz_activation_time', strtotime( "-2 month" ) );
 			//show review notice, only to free users
 			if ( ! defined( "cmplz_premium" ) && ! is_multisite() ) {
 				if ( ! get_option( 'cmplz_review_notice_shown' )
@@ -37,6 +41,8 @@ if ( ! class_exists( "cmplz_review" ) ) {
 				}
 			}
 
+			add_action('admin_init', array($this, 'process_get_review_dismiss' ));
+
 		}
 
 		static function this() {
@@ -44,7 +50,9 @@ if ( ! class_exists( "cmplz_review" ) ) {
 		}
 
 		public function show_leave_review_notice() {
-			/**
+			if (isset( $_GET['cmplz_dismiss_review'] ) ) return;
+
+				/**
 			 * Prevent notice from being shown on Gutenberg page, as it strips off the class we need for the ajax callback.
 			 *
 			 * */
@@ -99,8 +107,7 @@ if ( ! class_exists( "cmplz_review" ) ) {
 									'complianz-gdpr' ); ?></a>
 
 							<div class="dashicons dashicons-no-alt"></div>
-							<a href="#"
-							   class="review-dismiss"><?php _e( 'Don\'t show again',
+							<a href="<?php echo add_query_arg(array('page'=>'complianz', 'cmplz_dismiss_review'=>1), admin_url('admin.php') )?>"><?php _e( 'Don\'t show again',
 									'complianz-gdpr' ); ?></a>
 						</div>
 					</div>
@@ -162,8 +169,6 @@ if ( ! class_exists( "cmplz_review" ) ) {
 		 */
 
 		public function dismiss_review_notice_callback() {
-			check_ajax_referer( 'cmplz_dismiss_review', 'token' );
-
 			$type = isset( $_POST['type'] ) ? $_POST['type'] : false;
 
 			if ( $type === 'dismiss' ) {
@@ -175,6 +180,16 @@ if ( ! class_exists( "cmplz_review" ) ) {
 			}
 
 			wp_die(); // this is required to terminate immediately and return a proper response
+		}
+
+		/**
+		 * Dismiss review notice with get, which is more stable
+		 */
+
+		public function process_get_review_dismiss(){
+			if (isset( $_GET['cmplz_dismiss_review'] ) ){
+				update_option( 'cmplz_review_notice_shown', true );
+			}
 		}
 	}
 }

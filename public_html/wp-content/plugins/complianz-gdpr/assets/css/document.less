@@ -1,3 +1,5 @@
+@import 'document-grid.less';
+
 .postbox #cmplz-document {
   margin: auto auto;
 }
@@ -5,8 +7,8 @@
 #cmplz-document {
   font-size: 14px;
   margin-top: 0;
-  max-width: 580px;
-  text-align: justify;
+  max-width: 600px;
+  // text-align: justify;
   text-justify: inter-word;
 
   /* Buttons styles */
@@ -17,11 +19,25 @@
     padding: 0;
   }
 
-  /*honeypot */
+  /*WCAG2.0 */
 
-  .dnsmpd-firstname {
-    position: absolute !important;
-    left: -5000px !important;
+  a {
+  	text-decoration: underline;
+  }
+  a[target="_blank"]::after {
+  content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+  margin: 0 3px 0 5px;
+  }
+
+  a:focus {
+    border: 1px solid black;
+    padding:2px;
+  }
+
+  #cmplz-dnsmpd-form label{
+	margin-right:20px;
+	min-width:100px;
+	display:inline-block
   }
 
   .alert {
@@ -80,6 +96,8 @@
   }
 
 
+
+
   a.cc-revoke-custom:hover {
     background-color: #396a93;
     color: #fff;
@@ -95,6 +113,18 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #c6c6c6;
     margin-bottom: 10px;
+  }
+
+  &.impressum {
+	h2, h3 {
+	  border-bottom: none;
+	  font-size: 1em;
+	  padding-bottom:5px;
+	  margin-bottom:5px;
+	}
+	p {
+	  margin-bottom:7px;
+	}
   }
 
   h4 {
@@ -143,7 +173,7 @@
   ul {
     list-style: disc;
     margin-left: 15px;
-    margin-bottom:0;
+    margin-bottom: 15px;
   }
 
   ol.alphabetic ol {
@@ -157,17 +187,6 @@
     counter-increment: list
   }
 
-  table {
-    width: 100%;
-    margin-bottom: 30px;
-  }
-
-  table td {
-    text-align: left;
-    width: 33.33%;
-    word-break: break-word;
-  }
-
   .cmplz-subtitle {
     font-weight: bold;
     margin-top: 25px;
@@ -177,3 +196,100 @@
   }
 }
 
+/*
+	This css should also apply to the cookie shortcode only, so should not be wrapped in the cmplz-document styles
+*/
+#cmplz-cookies-overview {
+  .cmplz-service-header {
+	background-color: #f7f7f7;
+	margin: 5px 0;
+	text-decoration: none;
+
+	h3 {
+	  padding: 0 15px;
+	  border-bottom: 0;
+	  font-size: 18px;
+	  border-bottom: 0;
+	}
+
+	&:after {
+	  content: '';
+	  cursor: pointer;
+	  background: url(../images/down.png) no-repeat;
+	  transform: rotate(0deg);
+	  -webkit-transition: all 0.5s ease;
+	  -moz-transition: all 0.5s ease;
+	  -o-transition: all 0.5s ease;
+	  transition: all 0.5s ease;
+	  background-size: cover;
+	  height: 25px;
+	  width: 25px;
+	  margin: 12px 15px 12px 35px;
+	}
+
+	&.cmplz-service-open:after {
+	  transform: rotate(180deg);
+	}
+  }
+
+  .cmplz-service-desc {
+	h4 {
+	  font-size: 15px;
+	  margin: 5px 0;
+	}
+
+	h5 {
+	  margin: 0;
+	}
+
+	.cmplz-service-description {
+	  padding: 0 15px;
+	}
+
+	.cmplz-sharing-data {
+	  padding: 0 15px;
+	}
+  }
+
+  .cookies-per-purpose {
+	border: 1px solid #dadada;
+	grid-gap: 1px;
+	background-color: #dadada;
+	margin-bottom: 10px;
+
+	div {
+	  background-color: white;
+	  padding: 15px;
+	}
+
+	@media only screen and (min-width: 600px) {
+	  .name-header {
+		background-color: #f7f7f7;
+	  }
+
+	  .retention-header {
+		background-color: #f7f7f7;
+	  }
+
+	  .function-header {
+		background-color: #f7f7f7;
+	  }
+	}
+
+	@media only screen and (max-width: 600px) {
+	  h5 {
+		line-height: 1.8;
+	  }
+
+	  div:nth-child(12n+2),
+	  div:nth-child(12n+3),
+	  div:nth-child(12n+4),
+	  div:nth-child(12n+5),
+	  div:nth-child(12n+6),
+	  div:nth-child(12n+7) {
+		background-color: #f7f7f7;
+	  }
+	}
+
+  }
+}

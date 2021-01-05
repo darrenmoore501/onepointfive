@@ -7,12 +7,12 @@ $this->warning_types = array(
 		'label_error' => __( 'The Complianz plugin has new features. Please check the wizard to see if all your settings are still up to date.',
 			'complianz-gdpr' ),
 	),
-	'no-dnt'                        => array(
+	'no-dnt' => array(
 		'type'        => 'general',
-		'label_ok'    => __( 'Do Not Track is respected.', 'complianz-gdpr' ),
-		'label_error' => sprintf( __( 'The browser setting Do Not Track is not respected yet - (%spremium%s)',
+		'label_ok'    => __( 'Do Not Track & Global Privacy Control are respected.', 'complianz-gdpr' ),
+		'label_error' => sprintf( __( 'Do Not Track & Global Privacy Control are not respected yet - (%spremium%s)',
 			'complianz-gdpr' ),
-			'<a  target="_blank" href="https://complianz.io">', '</a>' )
+			'<a  target="_blank" href="https://complianz.io/browser-privacy-controls/">', '</a>' )
 	),
 	'wizard-incomplete'             => array(
 		'type'        => 'general',
@@ -46,7 +46,7 @@ $this->warning_types = array(
 			'complianz-gdpr' ),
 		'label_error' => __( 'Plugin changes have been detected.',
 				'complianz-gdpr' ) . " "
-		                 . sprintf( __( 'Please review step %s of the wizard for changes in plugin privacy statements and cookies.',
+		                 . sprintf( __( 'Please review step %s of the wizard for changes in plugin Privacy Statements and cookies.',
 				'complianz-gdpr' ), STEP_PLUGINS ),
 	),
 	'ga-needs-configuring'     => array(
@@ -56,7 +56,7 @@ $this->warning_types = array(
 	),
 	'gtm-needs-configuring'    => array(
 		'type'        => 'general',
-		'label_error' => __( 'Google Tagmanager is being used, but is not configured in Complianz.',
+		'label_error' => __( 'Google Tag Manager is being used, but is not configured in Complianz.',
 			'complianz-gdpr' ),
 	),
 	'matomo-needs-configuring' => array(
@@ -84,12 +84,28 @@ $this->warning_types = array(
 	'double-stats' => array(
 		'type'        => 'general',
 		'label_error' => __( 'You have a duplicate implementation of your statistics tool on your site.',
-			'complianz-gdpr' ),
+			'complianz-gdpr' )
+			. cmplz_read_more( 'https://complianz.io/duplicate-implementation-of-analytics/' ),
 	),
+
 	'api-disabled' => array(
 		'type'        => 'general',
 		'label_error' => __( 'You haven\'t accepted the usage of the cookiedatabase.org API. To automatically complete your cookie descriptions, please choose yes in the integrations step.',
 			'complianz-gdpr' ),
+	),
+
+	'no-jquery' => array(
+		'type'        => 'general',
+		'label_error' => __( 'jQuery was not detected on the front-end of your site. Complianz requires jQuery.', 'complianz-gdpr' ). cmplz_read_more( 'https://complianz.io/missing-jquery/' ),
+	),
+	'console-errors' => array(
+		'type'        => 'general',
+		'label_error' => __( 'Javascript errors are detected on the front-end of your site. This may break the cookie banner functionality.', 'complianz-gdpr' )
+		                 . '<br>'.__("Last error in the console:", "complianz-gdpr")
+		                 .'<div style="color:red">'
+		                 . cmplz_get_console_errors()
+		                 .'</div>'
+		                 . cmplz_read_more( 'https://complianz.io/cookie-banner-does-not-appear/' , false ),
 	),
 
 );

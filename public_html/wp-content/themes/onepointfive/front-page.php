@@ -15,41 +15,41 @@ get_header();
 			?>
 			<div class="container">
 				<div class="row justify-content-center top" >
-					<div class="col-md-6 col-sm-10">
+					<div class="col-md-10 col-sm-10 panel">
+					<div class="row">
+						<div class='col-md-7'>
 						<h1><?php the_title(); ?></h1>
-					<?php the_content(); ?>
+						
+						<?php the_content(); ?>
+						</div>
+				
+				
+				
+						<div class='col-md-5'>
+								<img  src="https://images.unsplash.com/photo-1552049879-1af647388e2e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1834&q=80" alt="IMG_20191128_165612-2-scaled" class="img-fluid"  />
+								<!-- https://images.unsplash.com/photo-1605477899141-ac050a727db1?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80 
+									
+									https://images.unsplash.com/photo-1510498920909-5f2cc51ea451?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80
+								-->
+						</div>
 					</div>
-				</div>
-				<!-- <div class="row justify-content-center top" >
-					<h2>Services</h2>
-				</div> -->
-				<div class="row justify-content-center top" >
-						<div class="col-md-3 panel col-sm-3">
-						<h2>Carbon Footprinting</h2>
-					<p>The first step to becoming carbon neutral or even carbon negative is to measure your footprint. Use our proven technique as specified by the UK Government to measure the footprint of your business and develop an action plan to reduce it in the future.</p>
-					<a href="/services/carbon-footprinting/">More</a>
-					</div>
-					<div class="col-md-3 panel col-sm-3">
-						<h2>Sustainable Marketing</h2>
-					<p>Use our marketing experience in the sustainable business world to market your business to deliver a measurable return on your investment.</p>
-					<a href="/services/sustainable-marketing/">More</a>
-					</div>
-						<div class="col-md-3 panel col-sm-3">
-						<h2>Carbon Negative Tech</h2>
-					<p>We utilise efficient open source web technologies and lean development approaches delivered on our carbon negative web hosting platform to deliver high performance tech solutions for your next project.</p>
-					<a href="/services/carbon-negative-tech/">More</a>
-					</div>
+			
 				
 				</div>
 					<div class="row justify-content-center top row3" >
-					<div class="col-md-6 abouttext col-sm-10">
+					<div class="col-md-6 panel col-sm-10">
 						<h2>About OnePointFive Comms </h2>
-						<p>We set up <strong>OnePointFive</strong> to address one big issue. The biggest issue of our times.<br /> Work with <strong>OnePointFive</strong> to make your business carbon neutral or even carbon negative by the end of the decade. Gain marketing and PR credibility, a competitive edge and cut waste and inefficiencies at the same time.</p>
+						<p>We set up One Point Five Degrees to address one big issue - to help organisations understand their impact on climate change and act to reduce it.</p><p>Work with <strong>OnePointFive</strong> to make your business carbon neutral or even carbon negative in 2021. Gain marketing and PR credibility, a competitive edge and cut waste and inefficiencies at the same time.</p>
 					<a href="/about/">More</a>
+					</div>
+					</div>
+					
+					<div class="row justify-content-center top row3" >
+					<div class="col-md-6 panel col-sm-10">
+						<h5>We support <a href="https://treesforlife.org.uk" class="trees">Trees For Life</a>, tree planting and rewilding the Scottish Highlands.</h5>
 					</div>
 					</div>
 			</div>
 		<?php endwhile; ?>
   </main>
-
 <?php get_footer(); ?>

@@ -48,18 +48,14 @@ function cmplz_integrations_page() {
 			<form action="" method="post" class="cmplz-body">
 				<?php
 				cmplz_notice( _x( "The script center should be used to add and block third-party scripts and iFrames before consent is given, or when consent is revoked. For example Hotjar and embedded video’s.",
-					'intro script center', 'complianz-gdpr' ) );
-				if ( COMPLIANZ::$cookie_admin->uses_google_tagmanager() ) {
-					cmplz_notice( __( 'Because you are using Google Tag Manager you can only add iFrames, as shown below.',
-						'complianz-gdpr' ), 'warning' );
-				}
+					'intro script center', 'complianz-gdpr' ) )
 				?>
 				<table class="form-table">
 
 					<tr>
 						<th></th>
 						<td><?php COMPLIANZ::$field->get_fields( 'wizard',
-								STEP_COOKIES, 7 ); ?>
+								STEP_COOKIES, 8 ); ?>
 						</td>
 					</tr>
 				</table>
@@ -82,7 +78,7 @@ function cmplz_integrations_page() {
 				$socialmedia_active = ( cmplz_get_value( 'uses_social_media' )
 				                        === 'yes' ) ? true : false;
 				if ( ! $thirdparty_active && ! $socialmedia_active ) {
-					$not_used = __( 'Third party services and social media',
+					$not_used = __( 'Third-party services and social media',
 						'complianz-gdpr' );
 					$link     = '<a href="' . add_query_arg( array(
 							'page'    => 'cmplz-wizard',
@@ -97,9 +93,25 @@ function cmplz_integrations_page() {
 				if ( $thirdparty_active || $socialmedia_active ) {
 					cmplz_notice( sprintf( __( "Enabled %s will be blocked on the front-end of your website until the user has given consent (opt-in), or after the user has revoked consent (opt-out). When possible a placeholder is activated. You can also disable or configure the placeholder to your liking.",
 							'complianz-gdpr' ),
-							__( "services", "complianz-gdpr" ) )
-					              . COMPLIANZ::$config->read_more( "https://complianz.io/blocking-recaptcha-manually/" ),
-						'warning' );
+								__( "services", "complianz-gdpr" ) )
+						              . cmplz_read_more( "https://complianz.io/blocking-recaptcha-manually/" ),
+							'warning' );
+
+					if (cmplz_get_value('block_recaptcha_service') === 'yes'){
+						if ( defined( 'cmplz_free' ) && cmplz_free ) {
+							cmplz_notice( sprintf( __( "reCaptcha is connected and will be blocked before consent. To change your settings, please visit %sIntegrations%s in the wizard. ",
+									'complianz-gdpr' ),
+									'<a href="' . admin_url( 'admin.php?page=cmplz-wizard&step=2&section=4' ) . '">',
+									'</a>' ),
+									'warning' );
+						} else {
+							cmplz_notice( sprintf( __( "reCaptcha is connected and will be blocked before consent. To change your settings, please visit %sIntegrations%s in the wizard. ",
+									'complianz-gdpr' ),
+									'<a href="' . admin_url( 'admin.php?page=cmplz-wizard&step=3&section=4' ) . '">',
+									'</a>' ),
+									'warning' );
+						}
+					}
 				}
 
 				?>
@@ -116,9 +128,13 @@ function cmplz_integrations_page() {
 					<?php
 
 					if ( $thirdparty_active ) {
-						$thirdparty_services
-							= COMPLIANZ::$config->thirdparty_services;
+						$thirdparty_services = COMPLIANZ::$config->thirdparty_services;
 						unset( $thirdparty_services['google-fonts'] );
+
+				        if (cmplz_get_value('block_recaptcha_service') !== 'yes'){
+							unset( $thirdparty_services['google-recaptcha'] );
+						}
+
 						$active_services
 							= cmplz_get_value( 'thirdparty_services_on_site' );
 						foreach ( $thirdparty_services as $service => $label ) {
@@ -135,6 +151,7 @@ function cmplz_integrations_page() {
 								'table'     => true,
 								'disabled'  => false,
 								'hidden'    => false,
+								'cols'    => false,
 							);
 
 							COMPLIANZ::$field->checkbox( $args, $active );
@@ -161,6 +178,7 @@ function cmplz_integrations_page() {
 								'table'     => true,
 								'disabled'  => false,
 								'hidden'    => false,
+								'cols'    => false,
 							);
 
 							COMPLIANZ::$field->checkbox( $args, $active );
@@ -180,6 +198,7 @@ function cmplz_integrations_page() {
 						'table'     => true,
 						'disabled'  => false,
 						'hidden'    => false,
+						'cols'    => false,
 					);
 
 					COMPLIANZ::$field->checkbox( $args, $uses_ad_cookies );
@@ -200,16 +219,17 @@ function cmplz_integrations_page() {
 				<?php
 				cmplz_notice( __( 'Below you will find the plugins currently detected and integrated with Complianz. Most plugins work by default, but you can also add a plugin to the script center or add it to the integration list.',
 						'complianz-gdpr' )
-				              . COMPLIANZ::$config->read_more( 'https://complianz.io/developers-guide-for-third-party-integrations' ) );
+				              . cmplz_read_more( 'https://complianz.io/developers-guide-for-third-party-integrations' ) );
 				cmplz_notice( sprintf( __( "Enabled %s will be blocked on the front-end of your website until the user has given consent (opt-in), or after the user has revoked consent (opt-out). When possible a placeholder is activated. You can also disable or configure the placeholder to your liking.",
 						'complianz-gdpr' ), __( "plugins", "complianz-gdpr" ) )
-				              . COMPLIANZ::$config->read_more( "https://complianz.io/blocking-recaptcha-manually/" ),
+				              . cmplz_read_more( "https://complianz.io/blocking-recaptcha-manually/" ),
 					'warning' );
 
 				$fields = COMPLIANZ::$config->fields( 'integrations' );
 				if ( count( $fields ) == 0 ) {
 					cmplz_notice( __( 'No active plugins detected in the integrations list.',
 						'complianz-gdpr' ), 'warning' );
+
 				}
 				?>
 				<table class="form-table">

@@ -8,7 +8,6 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		private static $_this;
 		public $position;
 		public $cookies = array();
-		public $known_wizard_keys;
 		public $total_steps = false;
 		public $last_section;
 		public $page_url;
@@ -21,31 +20,22 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			}
 
 			self::$_this = $this;
-
-			add_action( 'admin_enqueue_scripts',
-				array( $this, 'enqueue_assets' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 
 			//callback from settings
-			add_action( 'cmplz_wizard_last_step',
-				array( $this, 'wizard_last_step_callback' ), 10, 1 );
+			add_action( 'cmplz_wizard_last_step', array( $this, 'wizard_last_step_callback' ), 10, 1 );
 
 			//link action to custom hook
-			add_action( 'cmplz_wizard_wizard',
-				array( $this, 'wizard_after_step' ), 10, 1 );
+			add_action( 'cmplz_wizard_wizard', array( $this, 'wizard_after_step' ), 10, 1 );
 
 			//process custom hooks
 			add_action( 'admin_init', array( $this, 'process_custom_hooks' ) );
-
-			add_action( 'complianz_before_save_wizard_option',
-				array( $this, 'before_save_wizard_option' ), 10, 4 );
-			add_action( 'complianz_after_save_wizard_option',
-				array( $this, 'after_save_wizard_option' ), 10, 4 );
+			add_action( 'complianz_before_save_wizard_option', array( $this, 'before_save_wizard_option' ), 10, 4 );
+			add_action( 'complianz_after_save_wizard_option', array( $this, 'after_save_wizard_option' ), 10, 4 );
+			add_action( 'cmplz_after_saved_all_fields', array( $this, 'after_saved_all_fields' ), 10, 1 );
 
 			//dataleaks:
-
-			add_action( 'cmplz_is_wizard_completed',
-				array( $this, 'is_wizard_completed_callback' ) );
-
+			add_action( 'cmplz_is_wizard_completed', array( $this, 'is_wizard_completed_callback' ) );
 		}
 
 		static function this() {
@@ -56,7 +46,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		public function is_wizard_completed_callback() {
 			if ( $this->wizard_completed_once() ) {
 				cmplz_notice( __( "Great, the main wizard is completed. This means the general data is already in the system, and you can continue with the next question. This will start a new, empty document.",
-					'complianz-gdpr' ) );
+						'complianz-gdpr' ) );
 			} else {
 				$link = '<a href="' . admin_url( 'admin.php?page=cmplz-wizard' )
 				        . '">';
@@ -72,6 +62,10 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			do_action( "cmplz_wizard_$wizard_type" );
 		}
 
+		/**
+		 * Initialize a page in the wizard
+		 * @param $page
+		 */
 		public function initialize( $page ) {
 			$this->last_section = $this->last_section( $page, $this->step() );
 			$this->page_url     = admin_url( 'admin.php?page=cmplz-' . $page );
@@ -84,8 +78,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					$fieldvalue = get_post_meta( $post_id, $fieldname, true );
 					if ( $fieldvalue ) {
 						if ( ! COMPLIANZ::$field->is_multiple_field( $fieldname ) ) {
-							COMPLIANZ::$field->save_field( $fieldname,
-								$fieldvalue );
+							COMPLIANZ::$field->save_field( $fieldname, $fieldvalue );
 						} else {
 							$field[ $fieldname ] = $fieldvalue;
 							COMPLIANZ::$field->save_multiple( $field );
@@ -96,27 +89,9 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			}
 		}
 
-		public function show_notices() {
-			if ( ! cmplz_user_can_manage() ) {
-				return;
-			}
-
-			$screen = get_current_screen();
-			if ( $screen->parent_base === 'edit' ) {
-				return;
-			}
-
-			if ( COMPLIANZ::$cookie_admin->cookies_changed() ) {
-				?>
-				<div id="message" class="error fade notice cmplz-wp-notice">
-					<h2><?php echo __( "Changes in cookies detected",
-							'complianz-gdpr' ); ?></h2>
-				</div>
-				<?php
-			}
-		}
-
-
+		/**
+		 * Some actions after the last step has been completed
+		 */
 		public function wizard_last_step_callback() {
 			$page = $this->wizard_type();
 
@@ -125,7 +100,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					'complianz-gdpr' ), 'warning' );
 			} else {
 				cmplz_notice( sprintf( '<h1>'
-				                       . __( "All steps have been completed.",
+				                       . __( "All steps have been completed",
 						'complianz-gdpr' ) . "</h1>"
 				                       . __( "Click '%s' to complete the configuration. You can come back to change your configuration at any time.",
 						'complianz-gdpr' ),
@@ -136,8 +111,9 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					$link_open = '<a href="'
 					             . admin_url( 'admin.php?page=cmplz-cookiebanner' )
 					             . '">';
-					cmplz_notice( sprintf( __( "Your site needs a cookie warning. The cookie warning has been configured with default settings. Check the cookie warning settings to customize it.",
-						'complianz-gdpr' ), $link_open, "</a>" ), 'warning' );
+					cmplz_notice( sprintf( __( "The cookie banner and cookie blocker are enabled. Please check your website if your configuration is working properly. Please read %sthese instructions%s to debug any issues while in safe mode. Safe mode is available under settings.",
+						'complianz-gdpr' ), 				'<a  target="_blank" href="https://complianz.io/debugging-manual">', '</a>' )
+							, 'warning' );
 				}
 
 			}
@@ -145,7 +121,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		}
 
 
-		/*
+		/**
 		 * Process completion of setup
 		 *
 		 * */
@@ -158,22 +134,10 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			//clear document cache
 			COMPLIANZ::$document->clear_shortcode_transients();
 
-//			//create a page foreach page that is needed.
-//			$pages = COMPLIANZ::$document->get_required_pages();
-//			foreach ( $pages as $region => $region_pages ) {
-//				foreach ( $region_pages as $type => $page ) {
-//					if ( ! COMPLIANZ::$document->page_exists( $type,
-//						$region )
-//					) {
-//						COMPLIANZ::$document->create_page( $type, $region );
-//					}
-//				}
-//			}
-
 			//if the plugins page is reviewed, we can reset the privacy statement suggestions from WordPress.
 			if ( cmplz_wp_privacy_version()
 			     && ( $this->step( 'wizard' ) == STEP_PLUGINS )
-			     && cmplz_get_value( 'privacy-statement' ) === 'yes'
+			     && cmplz_get_value( 'privacy-statement' ) === 'generated'
 			) {
 				$policy_page_id
 					= (int) get_option( 'wp_page_for_privacy_policy' );
@@ -194,14 +158,6 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			          && isset( $_POST['cmplz-next'] ) )
 			) {
 				$this->set_wizard_completed_once();
-				//check if cookie warning should be enabled
-				if ( COMPLIANZ::$cookie_admin->site_needs_cookie_warning() ) {
-					cmplz_update_option( 'cookie_settings',
-						'cookie_warning_enabled', true );
-				} else {
-					cmplz_update_option( 'cookie_settings',
-						'cookie_warning_enabled', false );
-				}
 			}
 
 
@@ -217,7 +173,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			}
 		}
 
-		/*
+		/**
 		 * Do stuff before a page from the wizard is saved.
 		 *
 		 * */
@@ -225,6 +181,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		public function before_save_wizard_option(
 			$fieldname, $fieldvalue, $prev_value, $type
 		) {
+
 			update_option( 'cmplz_documents_update_date', time() );
 
 			//only run when changes have been made
@@ -233,10 +190,8 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			}
 
 			$enable_categories = false;
-			$tm_fires_scripts  = cmplz_get_value( 'fire_scripts_in_tagmanager' )
-			                     === 'yes' ? true : false;
-			$uses_tagmanager   = cmplz_get_value( 'compile_statistics' )
-			                     === 'google-tag-manager' ? true : false;
+			$tm_fires_scripts  = cmplz_get_value( 'fire_scripts_in_tagmanager' ) === 'yes' ? true : false;
+			$uses_tagmanager   = cmplz_get_value( 'compile_statistics' ) === 'google-tag-manager' ? true : false;
 
 			/* if tag manager fires scripts, cats should be enabled for each cookiebanner. */
 			if ( ( $fieldname === 'fire_scripts_in_tagmanager' )
@@ -267,7 +222,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 				if ( ! empty( $banners ) ) {
 					foreach ( $banners as $banner ) {
 						$banner                 = new CMPLZ_COOKIEBANNER( $banner->ID );
-						$banner->use_categories = true;
+						$banner->use_categories = 'visible';
 						$banner->save();
 					}
 				}
@@ -276,7 +231,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 
 			//when region or policy generation type is changed, update cookiebanner version to ensure the changed banner is loaded
 			if ( $fieldname === 'privacy-statement' || $fieldname === 'regions'
-			     || $fieldname === 'cookie-policy-type'
+			     || $fieldname === 'cookie-statement'
 			) {
 				cmplz_update_banner_version_all_banners();
 			}
@@ -299,21 +254,6 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					true );
 			}
 
-			//when the brand color is saved, update the cookie settings
-			//only if same as default color.
-			if ( $fieldname == 'brand_color' && ! empty( $fieldvalue ) ) {
-				$default_cookiebanner_id = cmplz_get_default_banner_id();
-				$banner
-				                         = new CMPLZ_COOKIEBANNER( $default_cookiebanner_id );
-				$default_color
-				                         = COMPLIANZ::$config->fields['popup_background_color']['default'];
-				if ( $banner->popup_background_color === $default_color ) {
-					$banner->popup_background_color = $fieldvalue;
-					$banner->button_text_color      = $fieldvalue;
-					$banner->save();
-				}
-			}
-
 			if ( $fieldname === 'configuration_by_complianz'
 			     || $fieldname === 'GTM_code'
 			     || $fieldname === 'matomo_url'
@@ -323,22 +263,33 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 				delete_option( 'cmplz_detected_stats_data' );
 				delete_option( 'cmplz_detected_stats_type' );
 			}
-
 		}
 
-		/*
+		/**
 		 * Handle some custom options after saving the wizard options
 		 *
-		 *
-		 * */
+		 * After all fields have been saved
+		 * @param $posted_fields
+		 */
 
-		public function after_save_wizard_option(
-			$fieldname, $fieldvalue, $prev_value, $type
-		) {
-
-			if ( $fieldname == 'california'
-			     || $fieldname == 'purpose_personaldata'
+		public function after_saved_all_fields($posted_fields){
+			//if the region is not EU anymore, and it was previously enabled for EU / eu_consent_regions, reset impressum
+			if ( array_key_exists('cmplz_regions', $posted_fields) && cmplz_get_value('eu_consent_regions') === 'yes' && !cmplz_has_region('eu')
 			) {
+				cmplz_update_option('wizard', 'eu_consent_regions', 'no' );
+			}
+		}
+
+		/**
+		 * Handle some custom options after saving the wizard options
+		 * @param string $fieldname
+		 * @param mixed $fieldvalue
+		 * @param mixed $prev_value
+		 * @param string $type
+		 */
+
+		public function after_save_wizard_option( $fieldname, $fieldvalue, $prev_value, $type ) {
+			if ( $fieldname == 'california' || $fieldname == 'purpose_personaldata' ) {
 				add_action( 'shutdown', 'cmplz_update_cookie_policy_title', 12 );
 			}
 
@@ -389,10 +340,10 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					foreach ( $banners as $banner ) {
 						$banner = new CMPLZ_COOKIEBANNER( $banner->ID );
 						if ( $enable_categories_uk ) {
-							$banner->use_categories_optinstats = true;
+							$banner->use_categories_optinstats = 'visible';
 						}
 						if ( $enable_categories_eu ) {
-							$banner->use_categories_optinstats = true;
+							$banner->use_categories_optinstats = 'visible';
 						}
 						$banner->save();
 					}
@@ -401,6 +352,13 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			}
 		}
 
+		/**
+		 * Get the next step with fields in it
+		 * @param string $page
+		 * @param int $step
+		 *
+		 * @return int
+		 */
 		public function get_next_not_empty_step( $page, $step ) {
 			if ( ! COMPLIANZ::$field->step_has_fields( $page, $step ) ) {
 				if ( $step >= $this->total_steps( $page ) ) {
@@ -413,22 +371,25 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 			return $step;
 		}
 
+		/**
+		 * Get the next section which is not empty
+		 * @param string $page
+		 * @param int $step
+		 * @param int $section
+		 *
+		 * @return int|bool
+		 */
 		public function get_next_not_empty_section( $page, $step, $section ) {
 			if ( ! COMPLIANZ::$field->step_has_fields( $page, $step,
 				$section )
 			) {
 				//some keys are missing, so we need to count the actual number of keys.
 				if ( isset( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'] ) ) {
-					$n
-						   = array_keys( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'] ); //<---- Grab all the keys of your actual array and put in another array
-					$count = array_search( $section,
-						$n ); //<--- Returns the position of the offset from this array using search
+					$n = array_keys( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'] ); //<---- Grab all the keys of your actual array and put in another array
+					$count = array_search( $section, $n ); //<--- Returns the position of the offset from this array using search
 
 					//this is the actual list up to section key.
-					$new_arr
-						           = array_slice( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'],
-						0, $count + 1,
-						true );//<--- Slice it with the 0 index as start and position+1 as the length parameter.
+					$new_arr = array_slice( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'], 0, $count + 1, true );//<--- Slice it with the 0 index as start and position+1 as the length parameter.
 					$section_count = count( $new_arr ) + 1;
 				} else {
 					$section_count = $section + 1;
@@ -440,8 +401,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					return false;
 				}
 
-				$section = $this->get_next_not_empty_section( $page, $step,
-					$section );
+				$section = $this->get_next_not_empty_section( $page, $step, $section );
 			}
 
 			return $section;
@@ -838,7 +798,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		}
 
 
-		/*
+		/**
 		 * Get a notice style header with an intro above a step or section
 		 *
 		 *
@@ -950,7 +910,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 					delete_option( 'complianz_options_' . $page );
 
 					if ( strpos( $page, 'processing' ) !== false ) {
-						$about = __( 'processing agreements',
+						$about = __( 'Processing Agreements',
 							'complianz-gdpr' );
 						$link_article
 						       = '<a href="https://complianz.io/what-are-processing-agreements">';

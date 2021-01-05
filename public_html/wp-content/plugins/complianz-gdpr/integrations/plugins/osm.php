@@ -60,14 +60,12 @@ add_action( 'wp_footer', 'cmplz_openstreetmaps_plugin_css' );
 function cmplz_openstreetmaps_plugin_css() {
 	?>
 	<style>
-		.cmplz-blocked-content-container .ol-popup {
+		.cmplz-placeholder-element .ol-popup {
 			display: none;
 		}
 	</style>
 	<?php
 }
-
-;
 
 
 

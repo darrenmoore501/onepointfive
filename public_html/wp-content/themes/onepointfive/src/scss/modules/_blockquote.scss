@@ -1,14 +1,13 @@
 blockquote {
 	position:    relative;
-	border-left: solid 3px $color-b;
+	border-left: solid 3px #FFF;
 	padding:     20px 30px 5px 40px;
-	background: #ebebeb;
-	
+	background: rgba(255,255,255,0.1);
 	&:before {
 		font-family: "Font Awesome 5 Free";
 		font-weight: 900;
 		content:     "\f10d";
-		color:       $color-b;
+		color:       #FFF;
 		position:    absolute;
 		left:        8px;
 		top:         0;
@@ -21,5 +20,8 @@ blockquote {
 		right:        8px;
 		top:         auto;
 		bottom: 10px
+	}
+	cite {
+		color:#1b9b05;
 	}
 }

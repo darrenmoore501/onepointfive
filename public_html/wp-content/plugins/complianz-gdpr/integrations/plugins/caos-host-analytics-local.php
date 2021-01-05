@@ -17,15 +17,42 @@ function cmplz_caos_script( $tags ) {
 	$tags[] = 'analytics.js';
 	$tags[] = 'gtag.js';
 	$tags[] = 'ga.js';
-	$tags[] = 'caosLocalGa';
-	$tags[] = 'CaosGtag';
 
+	$classes = COMPLIANZ::$cookie_admin->get_statistics_script_classes();
+
+	//block these only if not anonymous
+	if (!in_array('cmplz-native', $classes )) {
+		$tags[] = 'caosLocalGa';
+		$tags[] = 'CaosGtag';
+	}
 	return $tags;
 }
 
 /**
+ * Add the correct classes for the Caos script front-end
+ * @param $tag
+ * @param $handle
+ *
+ * @return string|string[]
+ */
+function cmplz_caos_add_data_attribute($tag, $handle) {
+	$frontend = new CAOS_Frontend_Tracking();
+	$caos_handle = $frontend->handle;
+
+	if ( $handle != $caos_handle )
+		return $tag;
+
+	$classes = COMPLIANZ::$cookie_admin->get_statistics_script_classes();
+	$attr = ' class="' . implode( ' ', $classes ) . '" ';
+
+	return str_replace( ' src', " $attr src", $tag );
+}
+add_filter('script_loader_tag', 'cmplz_caos_add_data_attribute', 10, 2);
+
+/**
  * We remove some actions to integrate fully
  * */
+
 function cmplz_caos_remove_scripts_others() {
 	remove_action( 'cmplz_statistics_script',
 		array( COMPLIANZ::$cookie_admin, 'get_statistics_script' ), 10 );
@@ -45,7 +72,6 @@ add_action( 'after_setup_theme', 'cmplz_caos_remove_scripts_others' );
 function cmplz_caos_filter_fields( $fields ) {
 	unset( $fields['configuration_by_complianz'] );
 	unset( $fields['UA_code'] );
-
 	return $fields;
 }
 
@@ -56,7 +82,6 @@ add_filter( 'cmplz_default_value', 'cmplz_caos_set_default', 20, 2 );
 function cmplz_caos_set_default( $value, $fieldname ) {
 	if ( $fieldname == 'compile_statistics' ) {
 		return "google-analytics";
-
 	}
 
 	return $value;

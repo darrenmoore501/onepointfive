@@ -36,7 +36,7 @@ header#masthead {
 			
 			li {
 				text-decoration: none;
-				display:         inline;
+				display:         inline-block;
 				position:        relative;
 				
 				a {
@@ -171,7 +171,7 @@ header#masthead  nav  #mobile-menu-wrapper {
 	transition:      all 0.25s ease;
 }	
 header#masthead nav ul li.menu-item-4297,header#masthead nav ul li.menu-item-4329 {
-	padding:10px;
+	padding:0;
 	background:white;
 	border-radius:50px;
 	color:#1b9b05;

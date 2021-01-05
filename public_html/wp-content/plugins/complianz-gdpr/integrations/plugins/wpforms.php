@@ -36,14 +36,14 @@ add_filter( 'cmplz_get_forms', 'cmplz_wpforms_get_plugin_forms', 10, 1 );
 
 add_filter( 'cmplz_dependencies', 'cmplz_wpforms_dependencies' );
 function cmplz_wpforms_dependencies( $tags ) {
+	if (cmplz_get_value('block_recaptcha_service') === 'yes'){
+		$site_key   = wpforms_setting( 'recaptcha-site-key', '' );
+		$secret_key = wpforms_setting( 'recaptcha-secret-key', '' );
 
-	$site_key   = wpforms_setting( 'recaptcha-site-key', '' );
-	$secret_key = wpforms_setting( 'recaptcha-secret-key', '' );
-
-	if ( ! empty( $site_key ) && ! empty( $secret_key ) ) {
-		$tags['recaptcha/api.js'] = 'grecaptcha';
+		if ( ! empty( $site_key ) && ! empty( $secret_key ) ) {
+			$tags['recaptcha/api.js'] = 'grecaptcha';
+		}
 	}
-
 	return $tags;
 }
 
@@ -58,7 +58,7 @@ function cmplz_wpforms_add_consent_checkbox( $form_id ) {
 	$wpforms_settings['gdpr'] = true;
 	update_option( 'wpforms_settings', $wpforms_settings );
 	$label
-		= sprintf( __( 'To submit this form, you need to accept our %sprivacy statement%s',
+		= sprintf( __( 'To submit this form, you need to accept our %sPrivacy Statement%s',
 		'complianz-gdpr' ),
 		'<a href="' . COMPLIANZ::$document->get_permalink( 'privacy-statement',
 			'eu', true ) . '">', '</a>' );
@@ -97,11 +97,10 @@ function cmplz_wpforms_css() {
 			position: relative !important;
 		}
 
-		div.wpforms-container-full .wpforms-form .cmplz-accept-cookies {
+		div.wpforms-container-full .wpforms-form .cmplz-accept-marketing {
 			background: grey;
 		}
 	</style>
 	<?php
 }
-
 ;

@@ -40,7 +40,8 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
         'content' => 'When you visit our website for the first time, we will show you a pop-up with an explanation about cookies. You do have the right to opt-out and to object against the further use of non-functional cookies.',
     ),
     array(
-        'content' => cmplz_revoke_link(),
+	    'subtitle' => 'Manage your consent settings',
+	    'content' => '[cmplz-manage-consent]',
     ),
 
     array(
@@ -60,13 +61,7 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
         'subtitle' => 'Analytical cookies',
         'content' => 'We use analytical cookies to optimize the website experience for our users. With these analytical cookies we get insights in the usage of our website.',
         'callback_condition' => 'cmplz_uses_statistics',
-        'condition' => array('compile_statistics' => 'yes'),
-    ),
-
-    array(
-        'subtitle' => 'Analytical cookies',
-        'content' => 'We do not use analytical cookies on this website.',
-        'condition' => array('compile_statistics' => 'no'),
+        'condition' => array('compile_statistics' => 'NOT no'),
     ),
 
     //ads
@@ -75,13 +70,13 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
         'content' => sprintf('On this website we use advertising cookies, enabling us to personalize the advertisements for you, and we (and third parties) gain insights into the campaign results. This happens based on a profile we create based on your click and surfing on and outside %s. With these cookies you, as website visitor are linked to a unique ID, so you do not see the same ad more than once for example.', '[domain]'),
         'condition' => array(
             'uses_ad_cookies' => 'yes',
-            'uses_ad_cookies_personalized' => 'yes'
+            'uses_ad_cookies_personalized' => 'NOT no'
         ),
     ),
 
     array(
         'subtitle' => 'Advertising cookies',
-        'content' => sprintf('On this website we use advertising cookies, enabling us to gain insights into the campaign results. This happens based on a profile we create based on your behavior on %s. With these cookies you, as website visitor are linked to a unique ID, but will not profile your behavior and interests to serve personalized ads.', '[domain]'),
+        'content' => sprintf('On this website we use advertising cookies, enabling us to gain insights into the campaign results. This happens based on a profile we create based on your behavior on %s. With these cookies you, as website visitor, are linked to a unique ID but these cookies will not profile your behavior and interests to serve personalized ads.', '[domain]'),
         'condition' => array(
             'uses_ad_cookies' => 'yes',
             'uses_ad_cookies_personalized' => 'no'
@@ -89,24 +84,20 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
     ),
 
     array(
-        'content' => 'You can object to the tracking by these cookies by clicking the "Revoke cookie consent" button.',
+        'content' => 'You can object to the tracking by these cookies by clicking the "Manage Consent" button.',
         'condition' => array(
             'uses_ad_cookies' => 'yes',
         ),
     ),
 
-    array(
-        'subtitle' => 'Advertising cookies',
-        'content' => 'We do not use any advertising cookies on this website.',
-        'condition' => array('uses_ad_cookies' => 'no'),
-    ),
-
-    //social media
-    array(
-        'subtitle' => 'Social media buttons',
-        'content' => 'On our website we do not use social media buttons to promote web pages or share them on social networks.',
-        'condition' => array('uses_social_media' => 'no'),
-    ),
+	array(
+		'subtitle' => 'Marketing/Tracking cookies', 'cookie policy',
+		'content' => 'Marketing/Tracking cookies are cookies or any other form of local storage, used to create user profiles to display advertising or to track the user on this website or across several websites for similar marketing purposes.',
+//		'condition' => array(
+//			'uses_ad_cookies' => 'no',
+//		),
+		'callback_condition' => 'cmplz_uses_marketing_cookies',
+	),
 
     array(
         'subtitle' => 'Social media buttons',
@@ -139,7 +130,7 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
                 <li>you may request an overview, in a commonly used format, of the data we process about you;</li>
                 <li>you may request correction or deletion of the data if it is incorrect or not or no longer relevant, or to ask to restrict the processing of the data.</li>
             </ul>' .
-            '<p>To exercise these rights, please contact us. Please refer to the contact details at the bottom of this cookie statement. If you have a complaint about how we handle your data, we would like to hear from you.</p>',
+            '<p>To exercise these rights, please contact us. Please refer to the contact details at the bottom of this Cookie Policy. If you have a complaint about how we handle your data, we would like to hear from you.</p>',
     ),
 
     array(
@@ -198,7 +189,7 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
 
     array(
         'title' => 'Contact details', 'Legal document cookie policy:',
-        'content' => 'For questions and/or comments about our cookie policy and this statement, please contact us by using the following contact details:',
+        'content' => 'For questions and/or comments about our Cookie Policy and this statement, please contact us by using the following contact details:',
     ),
 
     array(
@@ -211,7 +202,7 @@ $this->pages['us']['cookie-statement']['document_elements'] = array(
     ),
 
     array(
-        'content' => sprintf(_x('This cookie policy was synchronized with %scookiedatabase.org%s on %s', 'Legal document cookie policy', 'complianz-gdpr'),'<a href="https://cookiedatabase.org" target="_blank">', '</a>', '[sync_date]'),
+        'content' => sprintf(_x('This Cookie Policy was synchronized with %scookiedatabase.org%s on %s', 'Legal document cookie policy', 'complianz-gdpr'),'<a href="https://cookiedatabase.org" target="_blank">', '</a>', '[sync_date]'),
         'callback_condition' => array(
 	        'cmplz_cdb_reference_in_policy',
         )

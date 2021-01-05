@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) or die( "you do not have acces to this page!" );
-add_filter( 'cmplz_fields', 'cmplz_filter_fields', 10, 1 );
-function cmplz_filter_fields( $fields ) {
+add_filter( 'cmplz_fields_load_types', 'cmplz_filter_field_types', 10, 1 );
+function cmplz_filter_field_types( $fields ) {
 
 	/*
 	 * Add dynamic purposes
@@ -9,7 +9,7 @@ function cmplz_filter_fields( $fields ) {
 	 * */
 	if ( cmplz_has_region( 'us' )
 	     || ( cmplz_has_region( 'ca' )
-	          && cmplz_get_value( 'privacy-statement' ) === 'yes' )
+	          && cmplz_get_value( 'privacy-statement' ) === 'generated' )
 	) {
 		foreach ( COMPLIANZ::$config->purposes as $key => $label ) {
 
@@ -19,7 +19,7 @@ function cmplz_filter_fields( $fields ) {
 							'master_label' => __( "Purpose:", 'complianz-gdpr' )
 							                  . " " . $label,
 							'step' => STEP_COMPANY,
-							'section' => 7,
+							'section' => 8,
 							'source' => 'wizard',
 							'type' => 'multicheckbox',
 							'default' => '',
@@ -42,17 +42,26 @@ function cmplz_filter_fields( $fields ) {
 
 	}
 
+	return $fields;
+
+}
+
+add_filter( 'cmplz_fields', 'cmplz_filter_fields', 10, 1 );
+function cmplz_filter_fields( $fields ) {
 	/*
 	 * If it's not possible to configure the stats manually, because the three conditions are not met (anonymized ip, etc)
 	 * we unset the condition that makes these dependent of the manual config selection
 	 *
 	 * */
-
 	if ( ! cmplz_manual_stats_config_possible() ) {
 		unset( $fields['GTM_code']['condition'] );
 		unset( $fields['UA_code']['condition'] );
 		unset( $fields['matomo_site_id']['condition'] );
 		unset( $fields['matomo_url']['condition'] );
+	}
+
+	if (!cmplz_consent_api_active()) {
+		unset( $fields['category_prefs'] );
 	}
 
 	return $fields;

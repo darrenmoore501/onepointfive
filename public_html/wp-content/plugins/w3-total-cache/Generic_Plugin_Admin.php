@@ -42,6 +42,9 @@ class Generic_Plugin_Admin {
 				'\W3TC\Generic_WidgetServices',
 				'admin_init_w3tc_dashboard' ) );
 		add_action( 'admin_init_w3tc_dashboard', array(
+			'\W3TC\Generic_WidgetCommunity',
+			'admin_init_w3tc_dashboard' ) );
+		add_action( 'admin_init_w3tc_dashboard', array(
 				'\W3TC\Generic_WidgetBoldGrid',
 				'admin_init_w3tc_dashboard' ) );
 
@@ -200,8 +203,8 @@ class Generic_Plugin_Admin {
 		$score = apply_filters( 'w3tc_monitoring_score', $score );
 
 		header( "Content-Type: application/x-javascript; charset=UTF-8" );
-		echo 'document.getElementById("w3tc_monitoring_score").innerHTML = "' .
-			strtr( $score, '"', '.' ) . '";';
+		echo 'document.getElementById("w3tc_monitoring_score") && ( document.getElementById("w3tc_monitoring_score").innerHTML = "' .
+			strtr( $score, '"', '.' ) . '" );';
 
 		exit();
 	}
@@ -246,7 +249,22 @@ class Generic_Plugin_Admin {
 
 	// Define icon styles for the custom post type
 	function admin_head() {
-		if ( isset( $_GET['page'] ) && $_GET['page'] == 'w3tc_dashboard' ) {
+		$page = isset( $_GET['page'] ) ? $_GET['page'] : null;
+
+		if ( false !== strpos( $page, 'w3tc' ) && 'w3tc_setup_guide' !== $page && ! get_site_option( 'w3tc_setupguide_completed' ) ) {
+			$config       = new Config();
+			$state_master = Dispatcher::config_state_master();
+
+			if ( ! $config->get_boolean( 'pgcache.enabled' ) && $state_master->get_integer( 'common.install' ) > strtotime( 'NOW - 1 WEEK' ) ) {
+				if ( is_multisite() ) {
+					wp_redirect( esc_url( network_admin_url( 'admin.php?page=w3tc_setup_guide' ) ) );
+				} else {
+					wp_redirect( esc_url( admin_url( 'admin.php?page=w3tc_setup_guide' ) ) );
+				}
+			}
+		}
+
+		if ( 'w3tc_dashboard' === $page ) {
 ?>
 			<script type="text/javascript">
 			jQuery(function() {
@@ -269,6 +287,7 @@ class Generic_Plugin_Admin {
 			else
 				$profile = 'UA-2264433-8';
 
+			$state = Dispatcher::config_state();
 ?>
 			<script type="text/javascript">
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -286,7 +305,9 @@ class Generic_Plugin_Admin {
 					'dimension5': '<?php echo esc_attr( $_SERVER["SERVER_SOFTWARE"] ) ?>',
 					'dimension6': 'mysql<?php global $wpdb; echo $wpdb->db_version() ?>',
 					'dimension7': '<?php echo Util_Environment::home_url_host() ?>',
-					'userId': '<?php echo $current_user->user_email ?>',
+					'dimension9': '<?php echo esc_attr( $state->get_string( 'common.install_version' ) ) ?>',
+					'dimension10': '<?php echo esc_attr( Util_Environment::w3tc_edition( $this->_config ) ) ?>',
+					'dimension11': '<?php echo esc_attr( Util_Widget::list_widgets() ) ?>',
 					'page': '<?php echo $page ?>'
 				});
 
@@ -399,7 +420,7 @@ class Generic_Plugin_Admin {
 
 		if ( $this->is_w3tc_page ) {
 			wp_localize_script( 'w3tc-options', 'w3tc_nonce',
-				wp_create_nonce( 'w3tc' ) );
+				array( wp_create_nonce( 'w3tc' ) ) );
 		}
 
 

@@ -71,7 +71,7 @@ Class reSmushitUI {
 	 * @return none
 	 */
 	public static function headerPanel() {
-		$html = "<img src='". RESMUSHIT_BASE_URL . "images/header.jpg' />";
+		$html = "<img src='". RESMUSHIT_BASE_URL . "images/header.png' />";
 		self::fullWidthPanel($html);
 	}
 
@@ -427,6 +427,8 @@ Class reSmushitUI {
 				$additionnal = null;
 				if ( 1 == get_option( $machine_name ) ) $additionnal = 'checked="checked"'; 
 				$output .= "<input type='checkbox' name='$machine_name' id='$machine_name' value='1' ".  $additionnal ."/>";
+				break;
+			default:
 				break;
 		}
 		$output .= '</div>';

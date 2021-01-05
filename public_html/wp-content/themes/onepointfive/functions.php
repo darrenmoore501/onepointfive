@@ -97,3 +97,8 @@
 	require 'inc/class-posttypes.php';
 	require 'inc/class-navmenus.php';
 	require 'inc/class-settings.php';
+function check_ssl_twitter_card_image($image) {
+return preg_replace("/https/", 'http', $image);
+}
+// Hook into the Yoast plugin's hooks for handling the Twitter image
+add_action('wpseo_twitter_image', 'check_ssl_twitter_card_image');

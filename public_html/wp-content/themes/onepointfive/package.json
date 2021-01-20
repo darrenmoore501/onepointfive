@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@types/jquery": "^3.5.5",
-    "gsap": "^2.1.1"
+    "gsap": "^3.6.0"
   },
   "scripts": {
     "start": "gulp watch",
